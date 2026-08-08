@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Build output
+dist/
+build/
+bin/
+*.o
+*.so
+*.dylib
+
+# Test output
+coverage/
+.nyc_output/
+test-results/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment and secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Logs
+*.log
+
+# Go
+__debug_bin*
+
+# Archives
+*.tgz
+*.tar.gz
+*.zip
