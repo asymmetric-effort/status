@@ -5,16 +5,30 @@ Thank you for your interest in contributing to Bailfire.
 ## Getting Started
 
 1. Fork the repository
-2. Clone your fork: `git clone git@github.com:YOUR_USERNAME/bailfire.git`
-3. Create a feature branch: `git checkout -b feat/my-feature`
-4. Make your changes
-5. Submit a pull request
+2. Clone your fork: `git clone git@github.com:YOUR_USERNAME/status.git`
+3. Install dependencies: `npm install`
+4. Set up git hooks: `cp git-hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit`
+
+## Development Workflow
+
+```bash
+make build          # Build the SPA
+make test           # Run unit + integration tests
+make lint           # TypeScript type checking
+make cover          # Coverage report (must be >= 98%)
+make pdv            # Post-deployment verification (requires running server)
+make clean          # Clean build artifacts
+```
 
 ## Before Submitting a PR
 
-1. Ensure all tests pass
-2. Follow the existing code style
-3. Update documentation if needed
+The pre-commit hook enforces all checks automatically:
+
+1. `make clean` -- clean build state
+2. `make lint` -- TypeScript type checking passes
+3. `make test` -- all tests pass
+4. `make build` -- SPA builds successfully
+5. `make cover` -- coverage >= 98%
 
 ## Commit Messages
 
@@ -26,11 +40,13 @@ Use conventional commits:
 - `refactor:` -- code restructuring
 - `perf:` -- performance improvement
 - `chore:` -- tooling, CI, etc.
+- `status:` -- service status update
 
 ## Code Style
 
-- Write clear, readable code
-- Add tests for new functionality
+- TypeScript strict mode
+- No third-party dependencies without explicit authorization
+- Write tests for new functionality
 - Keep pull requests focused and small
 
 ## Intellectual Property

@@ -10,10 +10,14 @@ bin/
 *.so
 *.dylib
 
+# Build intermediate
+.build/
+
 # Test output
 coverage/
 .nyc_output/
 test-results/
+playwright-report/
 
 # IDE
 .idea/

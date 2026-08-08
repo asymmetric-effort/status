@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  echo "Usage: ./setup --url <custom-domain>"
+  echo ""
+  echo "Sets up a freshly forked Bailfire status page."
+  echo ""
+  echo "Options:"
+  echo "  --url   Custom domain for the status page (e.g., status.example.com)"
+  exit 1
+}
+
+URL=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --url)    URL="$2"; shift 2 ;;
+    --help|-h) usage ;;
+    *)        echo "Unknown option: $1"; usage ;;
+  esac
+done
+
+if [[ -z "$URL" ]]; then
+  echo "Error: --url is required."
+  usage
+fi
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+echo "Setting up Bailfire for $URL..."
+
+# Reset status.yaml to defaults
+cat > status.yaml <<EOF
+title: "System Status"
+url: "$URL"
+services: []
+EOF
+
+# Update CNAME
+echo "$URL" > CNAME
+
+# Install dependencies
+echo "Installing dependencies..."
+npm install
+
+# Set up git hooks
+echo "Setting up git hooks..."
+mkdir -p .git/hooks
+cp git-hooks/pre-commit .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+
+echo ""
+echo "Setup complete!"
+echo ""
+echo "Next steps:"
+echo "  1. Add services:  ./update-status --service 'API' --status up --message 'All systems operational'"
+echo "  2. Build locally:  make build"
+echo "  3. Test locally:   make test"
+echo "  4. Configure DNS:  Add a CNAME record for $URL pointing to <your-org>.github.io"
+echo "  5. Enable GitHub Pages in your repo settings (source: GitHub Actions)"

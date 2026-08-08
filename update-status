@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  echo "Usage: ./update-status --service <name> --status <up|down|degraded> --message <msg>"
+  echo ""
+  echo "Updates the status of a service in status.yaml, then commits and pushes."
+  echo ""
+  echo "Options:"
+  echo "  --service   Service name (required)"
+  echo "  --status    One of: up, down, degraded (required)"
+  echo "  --message   Status message (required)"
+  exit 1
+}
+
+SERVICE=""
+STATUS=""
+MESSAGE=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --service)  SERVICE="$2"; shift 2 ;;
+    --status)   STATUS="$2"; shift 2 ;;
+    --message)  MESSAGE="$2"; shift 2 ;;
+    --help|-h)  usage ;;
+    *)          echo "Unknown option: $1"; usage ;;
+  esac
+done
+
+if [[ -z "$SERVICE" || -z "$STATUS" || -z "$MESSAGE" ]]; then
+  echo "Error: --service, --status, and --message are all required."
+  usage
+fi
+
+if [[ "$STATUS" != "up" && "$STATUS" != "down" && "$STATUS" != "degraded" ]]; then
+  echo "Error: --status must be one of: up, down, degraded"
+  exit 1
+fi
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+echo "Updating service '$SERVICE' → $STATUS..."
+node --experimental-strip-types "$SCRIPT_DIR/scripts/yaml-update.ts" \
+  --service "$SERVICE" \
+  --status "$STATUS" \
+  --message "$MESSAGE"
+
+echo "Committing and pushing..."
+cd "$SCRIPT_DIR"
+git add status.yaml
+git commit -m "status: update $SERVICE to $STATUS"
+git push
+
+echo "Done. Status page will rebuild automatically."

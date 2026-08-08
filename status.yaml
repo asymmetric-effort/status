@@ -1,0 +1,11 @@
+title: "System Status"
+url: "status.asymmetric-effort.com"
+services:
+  - name: "Website"
+    status: "up"
+    message: "All systems operational"
+    updated: "2026-08-08T00:00:00Z"
+  - name: "API"
+    status: "up"
+    message: "All systems operational"
+    updated: "2026-08-08T00:00:00Z"

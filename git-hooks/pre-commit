@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Running pre-commit checks..."
+
+make clean
+make lint
+make test
+make build
+make cover
+
+echo "All pre-commit checks passed."
