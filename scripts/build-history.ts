@@ -119,13 +119,13 @@ function buildHourlyHistogram(
     const hours: HistogramStatus[] = new Array(totalHours).fill("no-data");
 
     for (let h = 0; h < totalHours; h++) {
-      const hourStart = new Date(startTime.getTime() + h * 3600000);
+      const hourEnd = new Date(startTime.getTime() + (h + 1) * 3600000);
 
-      // Find the most recent status change at or before this hour
+      // Find the most recent status change within or before this hour
       let currentStatus: HistogramStatus = "no-data";
       for (const change of changes) {
         const changeTime = new Date(change.timestamp);
-        if (changeTime <= hourStart) {
+        if (changeTime < hourEnd) {
           currentStatus = change.status;
         } else {
           break;
