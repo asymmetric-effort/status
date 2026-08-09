@@ -47,7 +47,7 @@ RUN apt-get update && apt-get install -y \
     libgcrypt20 \
     libksba8 \
     libnpth0 \
-    libreadline8t64 \
+    libreadline8 \
     libsqlite3-0 \
     libldap-2.5-0 \
     pinentry-tty \
