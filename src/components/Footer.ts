@@ -6,15 +6,7 @@ interface FooterProps {
 
 export function Footer({ version }: FooterProps) {
   return createElement("footer", { className: "footer" },
-    createElement("p", null,
-      "\u00A9 2025-2026 ",
-      createElement("a", {
-        href: "https://asymmetric-effort.com",
-        target: "_blank",
-        rel: "noopener noreferrer",
-      }, "Asymmetric Effort, LLC"),
-      ". MIT License."
-    ),
+    createElement("p", null, `\u00A9 2025-2026 Asymmetric Effort, LLC. MIT License.`),
     createElement("p", { className: "footer-version" }, version)
   );
 }

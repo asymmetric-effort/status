@@ -28,8 +28,7 @@ test.describe("Status Page PDV", () => {
   test("footer shows copyright notice", async ({ page }) => {
     await page.goto("/");
     const footer = page.locator(".footer");
-    await expect(footer).toContainText("2025-2026 Asymmetric Effort, LLC");
-    await expect(footer).toContainText("MIT License.");
+    await expect(footer).toContainText("\u00A9 2025-2026 Asymmetric Effort, LLC. MIT License.");
   });
 
   test("status.json is fetchable and valid", async ({ request }) => {

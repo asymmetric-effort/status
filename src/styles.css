@@ -235,23 +235,14 @@ body {
   color: var(--color-down);
 }
 
-/* Footer */
+/* Footer — matches specifyjs.asymmetric-effort.com */
 .footer {
   text-align: center;
   margin-top: 3rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--color-border);
-  font-size: 0.8125rem;
-  color: var(--color-text-secondary);
-}
-
-.footer a {
-  color: var(--color-text-secondary);
-  text-decoration: underline;
-}
-
-.footer a:hover {
-  color: var(--color-text);
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+  font-size: 13px;
+  color: #94a3b8;
 }
 
 .footer-version {
