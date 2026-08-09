@@ -5,6 +5,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -16,7 +18,10 @@ var newCmd = &cobra.Command{
 Secrets or local keyring), generate a new PQC composite keypair, re-encrypt
 the status data, and store the new private key in GitHub Secrets.
 
-The old keypair is replaced entirely.`,
+The old keypair is retained in data/keys/ so historical encrypted data
+can still be decrypted. The GitHub Secret (STATUS_GPG_PRIVATE_KEY)
+contains all private keys (current + previous) so CI can decrypt any
+version of the data from git history.`,
 	RunE: runNew,
 }
 
@@ -43,11 +48,29 @@ func runNew(cmd *cobra.Command, args []string) error {
 	}
 
 	dataDir := filepath.Join(repoRoot, "data")
+	keysDir := filepath.Join(dataDir, "keys")
 	encPath := filepath.Join(dataDir, "status.yaml.gpg")
 	plainPath := filepath.Join(repoRoot, "status.yaml.plain.tmp")
 
 	if _, err := os.Stat(encPath); os.IsNotExist(err) {
 		return fmt.Errorf("encrypted status not found at %s\nRun 'rekey init' first", encPath)
+	}
+
+	if err := os.MkdirAll(keysDir, 0o755); err != nil {
+		return fmt.Errorf("failed to create data/keys/: %w", err)
+	}
+
+	// Archive the current public key before replacing it
+	currentPubKey := filepath.Join(dataDir, "public.gpg")
+	if _, err := os.Stat(currentPubKey); err == nil {
+		oldFingerprint := getKeyFingerprint(currentPubKey)
+		timestamp := time.Now().UTC().Format("20060102T150405Z")
+		archiveName := fmt.Sprintf("public-%s-%s.gpg", timestamp, shortFingerprint(oldFingerprint))
+		archivePath := filepath.Join(keysDir, archiveName)
+		fmt.Printf("Archiving current public key → data/keys/%s\n", archiveName)
+		if err := copyFile(currentPubKey, archivePath); err != nil {
+			return fmt.Errorf("failed to archive public key: %w", err)
+		}
 	}
 
 	// Decrypt current file
@@ -80,10 +103,11 @@ func runNew(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to export public key: %w", err)
 	}
 
-	// Store new private key in GitHub Secrets
-	fmt.Println("Storing new private key in GitHub Secrets (STATUS_GPG_PRIVATE_KEY)...")
-	if err := storePrivateKeyInSecrets(fingerprint); err != nil {
-		return fmt.Errorf("failed to store private key: %w", err)
+	// Export ALL private keys (current + previous) to GitHub Secrets
+	// This ensures CI can decrypt data encrypted with any historical key
+	fmt.Println("Storing all private keys in GitHub Secrets (STATUS_GPG_PRIVATE_KEY)...")
+	if err := storeAllPrivateKeysInSecrets(); err != nil {
+		return fmt.Errorf("failed to store private keys: %w", err)
 	}
 
 	// Re-encrypt with new key
@@ -95,7 +119,8 @@ func runNew(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to re-encrypt: %w", err)
 	}
 
-	// Delete private key from local keyring
+	// Delete only the NEW private key from local keyring
+	// Old keys stay so the user can decrypt historical data locally
 	fmt.Println("Deleting new private key from local keyring...")
 	if err := deletePrivateKey(fingerprint); err != nil {
 		fmt.Fprintf(os.Stderr, "WARNING: Failed to delete local private key: %v\n", err)
@@ -103,7 +128,7 @@ func runNew(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Println("")
-	fmt.Println("Re-key complete.")
+	fmt.Println("Re-key complete. Previous keys retained in data/keys/.")
 	fmt.Println("")
 	fmt.Println("Next steps:")
 	fmt.Println("  1. git add data/")
@@ -118,6 +143,54 @@ func decryptFile(inputPath, outputPath string) error {
 		"--decrypt",
 		"--output", outputPath,
 		inputPath)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+func getKeyFingerprint(pubKeyPath string) string {
+	out, err := exec.Command("gpg", "--import-options", "show-only",
+		"--import", "--with-colons", pubKeyPath).Output()
+	if err != nil {
+		return "unknown"
+	}
+	for _, line := range strings.Split(string(out), "\n") {
+		if strings.HasPrefix(line, "fpr:") {
+			fields := strings.Split(line, ":")
+			if len(fields) >= 10 {
+				return fields[9]
+			}
+		}
+	}
+	return "unknown"
+}
+
+func shortFingerprint(fp string) string {
+	if len(fp) >= 16 {
+		return fp[len(fp)-16:]
+	}
+	return fp
+}
+
+func copyFile(src, dst string) error {
+	data, err := os.ReadFile(src)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(dst, data, 0o644)
+}
+
+// storeAllPrivateKeysInSecrets exports every secret key in the local
+// keyring and stores the combined ASCII armored output in GitHub Secrets.
+// This allows CI to decrypt data encrypted with any historical key.
+func storeAllPrivateKeysInSecrets() error {
+	privKeys, err := exec.Command("gpg", "--armor", "--export-secret-keys").Output()
+	if err != nil {
+		return fmt.Errorf("failed to export private keys: %w", err)
+	}
+
+	cmd := exec.Command("gh", "secret", "set", "STATUS_GPG_PRIVATE_KEY",
+		"--body", string(privKeys))
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()

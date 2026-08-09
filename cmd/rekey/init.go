@@ -48,6 +48,15 @@ func runInit(cmd *cobra.Command, args []string) error {
 	}
 
 	dataDir := filepath.Join(repoRoot, "data")
+
+	// Clear any existing BaleFire keys — init does not preserve old keys
+	fmt.Println("Clearing any existing BaleFire GPG keys...")
+	removeBalefireKeys()
+	keysDir := filepath.Join(dataDir, "keys")
+	os.RemoveAll(keysDir)
+	os.Remove(filepath.Join(dataDir, "public.gpg"))
+	os.Remove(filepath.Join(dataDir, "status.yaml.gpg"))
+
 	if err := os.MkdirAll(dataDir, 0o755); err != nil {
 		return fmt.Errorf("failed to create data/: %w", err)
 	}
