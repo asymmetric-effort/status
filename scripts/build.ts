@@ -38,6 +38,7 @@ async function build(): Promise<void> {
   console.log("Copying static assets...");
   copyFileSync(resolve(rootDir, "index.html"), resolve(distDir, "index.html"));
   copyFileSync(resolve(rootDir, "src/styles.css"), resolve(distDir, "styles.css"));
+  copyFileSync(resolve(rootDir, "src/favicon.svg"), resolve(distDir, "favicon.svg"));
 
   if (existsSync(resolve(rootDir, "CNAME"))) {
     copyFileSync(resolve(rootDir, "CNAME"), resolve(distDir, "CNAME"));
