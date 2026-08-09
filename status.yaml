@@ -25,3 +25,7 @@ services:
     status: "degraded"
     message: "Still computing the ultimate question"
     updated: "2026-08-09T14:22:00Z"
+  - name: "Hal9000"
+    status: "degraded"
+    message: "I'm sorry Dave, I'm afraid I can't do that at full speed"
+    updated: "2026-08-09T18:09:27.742Z"
