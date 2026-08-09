@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { parseStatusYaml } from "./yaml-to-json.ts";
 
@@ -75,6 +75,18 @@ const isMain = process.argv[1]?.endsWith("lint-status.ts");
 if (isMain) {
   const rootDir = resolve(import.meta.dirname, "..");
   const yamlPath = resolve(rootDir, "status.yaml");
+
+  if (!existsSync(yamlPath)) {
+    // status.yaml may be encrypted at data/status.yaml.gpg
+    const encPath = resolve(rootDir, "data/status.yaml.gpg");
+    if (existsSync(encPath)) {
+      console.log("status.yaml: skipped (encrypted at data/status.yaml.gpg, decrypt first)");
+      process.exit(0);
+    }
+    console.error("status.yaml: not found");
+    process.exit(1);
+  }
+
   const content = readFileSync(yamlPath, "utf-8");
   const errors = lintStatusYaml(content);
 

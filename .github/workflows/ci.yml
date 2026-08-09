@@ -9,25 +9,18 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/asymmetric-effort/status/runner:latest
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           fetch-tags: true
 
-      - run: npm ci
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
 
-      - name: Decrypt status.yaml (if encrypted)
-        run: |
-          if [ -f data/status.yaml.gpg ]; then
-            echo "${{ secrets.STATUS_GPG_PRIVATE_KEY }}" | gpg --batch --import
-            gpg --batch --yes --decrypt --output status.yaml data/status.yaml.gpg
-          fi
+      - run: npm ci
 
       - run: make lint
 
