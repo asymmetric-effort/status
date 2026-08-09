@@ -59,7 +59,7 @@ function main(): void {
   // Commit and tag
   execSync(`git add package.json`, { stdio: "inherit" });
   execSync(`git commit -m "chore: bump version to ${next}"`, { stdio: "inherit" });
-  execSync(`git tag ${newTag}`, { stdio: "inherit" });
+  execSync(`git tag -a ${newTag} -m "Release ${newTag}"`, { stdio: "inherit" });
 
   console.log(`Version bumped: ${tag} → ${newTag}`);
 }
