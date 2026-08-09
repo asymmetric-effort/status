@@ -1,0 +1,29 @@
+name: Notify
+
+on:
+  push:
+    branches: [main]
+    paths: [status.yaml]
+
+jobs:
+  lint-and-notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint status.yaml
+        run: node --experimental-strip-types scripts/lint-status.ts
+
+      - name: Send notifications
+        run: node --experimental-strip-types scripts/notify.ts
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          STATUS_PAGE_URL: ${{ secrets.STATUS_PAGE_URL }}

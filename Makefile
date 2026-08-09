@@ -5,6 +5,7 @@ clean:
 
 lint:
 	npx tsc --noEmit
+	node --experimental-strip-types scripts/lint-status.ts
 
 test:
 	node --experimental-strip-types --test tests/unit/**/*.test.ts tests/integration/**/*.test.ts
