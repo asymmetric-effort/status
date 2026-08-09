@@ -1,5 +1,5 @@
 import { describe, it, expect } from "@asymmetric-effort/nogginlessdom";
-import { getDayStatus, STATUS_LABELS } from "../../../src/components/Histogram.ts";
+import { getDayStatus, STATUS_LABELS, formatHour } from "../../../src/components/Histogram.ts";
 import { renderToString } from "@asymmetric-effort/specifyjs/server";
 import { createElement } from "@asymmetric-effort/specifyjs";
 import { Histogram } from "../../../src/components/Histogram.ts";
@@ -33,6 +33,14 @@ describe("STATUS_LABELS", () => {
     expect(STATUS_LABELS["degraded"]).toBe("Degraded");
     expect(STATUS_LABELS["down"]).toBe("Down");
     expect(STATUS_LABELS["no-data"]).toBe("No Data");
+  });
+});
+
+describe("formatHour", () => {
+  it("formats a date to month day and time", () => {
+    const result = formatHour(new Date("2026-08-09T14:00:00Z"));
+    expect(result).toContain("Aug");
+    expect(result).toContain("9");
   });
 });
 
@@ -85,7 +93,7 @@ describe("Histogram component", () => {
     expect(html).toContain("uptime");
   });
 
-  it("renders 90 histogram bars", () => {
+  it("renders 2160 hourly histogram bars", () => {
     const html = renderToString(createElement(Histogram as any, {
       serviceName: "Web",
       hours: mockHours,
@@ -96,7 +104,34 @@ describe("Histogram component", () => {
       currentMessage: "All systems operational",
     }));
     const barCount = (html.match(/histogram-bar/g) || []).length;
-    expect(barCount).toBe(90);
+    expect(barCount).toBe(2160);
+  });
+
+  it("renders a scrollable chart container", () => {
+    const html = renderToString(createElement(Histogram as any, {
+      serviceName: "Web",
+      hours: mockHours,
+      startTime: "2026-05-11T00:00:00Z",
+      onClose: () => {},
+      messages: [],
+      currentStatus: "up",
+      currentMessage: "All systems operational",
+    }));
+    expect(html).toContain("histogram-chart-container");
+  });
+
+  it("renders date markers", () => {
+    const html = renderToString(createElement(Histogram as any, {
+      serviceName: "Web",
+      hours: mockHours,
+      startTime: "2026-05-11T00:00:00Z",
+      onClose: () => {},
+      messages: [],
+      currentStatus: "up",
+      currentMessage: "All systems operational",
+    }));
+    expect(html).toContain("histogram-date-label");
+    expect(html).toContain("histogram-date-markers");
   });
 
   it("renders legend items", () => {

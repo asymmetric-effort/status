@@ -24,6 +24,15 @@ function formatDate(date: Date): string {
   return `${month} ${day}`;
 }
 
+function formatHour(date: Date): string {
+  return date.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 function formatTimestamp(iso: string): string {
   const date = new Date(iso);
   if (isNaN(date.getTime())) return iso;
@@ -47,17 +56,16 @@ function getDayStatus(hourStatuses: HistogramStatus[]): HistogramStatus {
 export function Histogram({ serviceName, hours, startTime, currentStatus, currentMessage, messages, onClose }: HistogramProps) {
   const start = new Date(startTime);
 
-  // Group hours into days (90 days)
-  const days: Array<{ date: Date; hours: HistogramStatus[]; overall: HistogramStatus }> = [];
-  for (let d = 0; d < 90; d++) {
-    const dayStart = d * 24;
-    const dayHours = hours.slice(dayStart, dayStart + 24);
-    const date = new Date(start.getTime() + d * 86400000);
-    days.push({
-      date,
-      hours: dayHours,
-      overall: getDayStatus(dayHours),
-    });
+  // Build day boundary labels for date markers
+  const dayLabels: Array<{ index: number; label: string }> = [];
+  for (let h = 0; h < hours.length; h++) {
+    if (h % 24 === 0) {
+      const date = new Date(start.getTime() + h * 3600000);
+      // Show label every 7 days to avoid crowding
+      if (h % (24 * 7) === 0) {
+        dayLabels.push({ index: h, label: formatDate(date) });
+      }
+    }
   }
 
   // Calculate uptime percentage (excluding no-data hours)
@@ -80,18 +88,30 @@ export function Histogram({ serviceName, hours, startTime, currentStatus, curren
       createElement("div", { className: "histogram-uptime" },
         `${uptimePercent}% uptime (past 90 days)`
       ),
-      createElement("div", { className: "histogram-chart" },
-        ...days.map((day, i) =>
-          createElement("div", {
-            key: String(i),
-            className: `histogram-bar histogram-${day.overall}`,
-            title: `${formatDate(day.date)}: ${STATUS_LABELS[day.overall]}`,
+      createElement("div", { className: "histogram-chart-container" },
+        createElement("div", { className: "histogram-chart" },
+          ...hours.map((status, i) => {
+            const hourDate = new Date(start.getTime() + i * 3600000);
+            return createElement("div", {
+              key: String(i),
+              className: `histogram-bar histogram-${status}`,
+              title: `${formatHour(hourDate)}: ${STATUS_LABELS[status]}`,
+            });
           })
+        ),
+        createElement("div", { className: "histogram-date-markers" },
+          ...dayLabels.map((dl) =>
+            createElement("span", {
+              key: String(dl.index),
+              className: "histogram-date-label",
+              style: `left:${(dl.index / hours.length) * 100}%`,
+            }, dl.label)
+          )
         )
       ),
       createElement("div", { className: "histogram-dates" },
-        createElement("span", null, formatDate(days[0].date)),
-        createElement("span", null, "Today")
+        createElement("span", null, formatDate(start)),
+        createElement("span", null, "Now")
       ),
       createElement("div", { className: "histogram-legend" },
         ...Object.entries(STATUS_LABELS).map(([status, label]) =>
@@ -130,4 +150,4 @@ export function Histogram({ serviceName, hours, startTime, currentStatus, curren
   );
 }
 
-export { getDayStatus, STATUS_LABELS, formatTimestamp };
+export { getDayStatus, STATUS_LABELS, formatTimestamp, formatHour };
