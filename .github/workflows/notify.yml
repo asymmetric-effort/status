@@ -18,6 +18,9 @@ jobs:
 
       - run: npm ci
 
+      - name: Check GnuPG version
+        run: bash scripts/check-gpg.sh
+
       - name: Lint status.yaml
         run: node --experimental-strip-types scripts/lint-status.ts
 

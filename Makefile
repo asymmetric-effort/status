@@ -1,4 +1,7 @@
-.PHONY: clean lint test build pdv cover version version/major version/minor version/patch
+.PHONY: clean lint test build pdv cover version version/major version/minor version/patch check-gpg
+
+check-gpg:
+	@bash scripts/check-gpg.sh
 
 clean:
 	rm -rf dist .build coverage test-results playwright-report

@@ -29,6 +29,9 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
+# Verify GnuPG version for PQC support
+bash "$SCRIPT_DIR/scripts/check-gpg.sh"
+
 echo "Setting up Balefire for $URL..."
 
 # Reset status.yaml to defaults
