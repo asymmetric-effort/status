@@ -1,4 +1,4 @@
-import { mkdirSync, copyFileSync, rmSync, existsSync, readdirSync } from "node:fs";
+import { mkdirSync, copyFileSync, rmSync, existsSync, readdirSync, writeFileSync } from "node:fs";
 import { resolve, join } from "node:path";
 import { execFileSync } from "node:child_process";
 
@@ -48,6 +48,34 @@ async function build(): Promise<void> {
   execFileSync(process.execPath, [
     "--experimental-strip-types",
     resolve(rootDir, "scripts/yaml-to-json.ts"),
+  ], { stdio: "inherit" });
+
+  // Step 5: Generate version.json from latest git tag
+  console.log("Generating version.json...");
+  let version = "v0.0.0";
+  try {
+    version = execFileSync("git", ["describe", "--tags", "--abbrev=0"], {
+      cwd: rootDir,
+      encoding: "utf-8",
+    }).trim();
+  } catch {
+    // No tags yet
+  }
+  writeFileSync(resolve(distDir, "version.json"), JSON.stringify({ version }) + "\n");
+  console.log(`Version: ${version}`);
+
+  // Step 6: Build 90-day histogram from git history
+  console.log("Building 90-day status history...");
+  execFileSync(process.execPath, [
+    "--experimental-strip-types",
+    resolve(rootDir, "scripts/build-history.ts"),
+  ], { cwd: rootDir, stdio: "inherit" });
+
+  // Step 6: Build /json endpoint (status + history combined)
+  console.log("Building /json endpoint...");
+  execFileSync(process.execPath, [
+    "--experimental-strip-types",
+    resolve(rootDir, "scripts/build-json-endpoint.ts"),
   ], { stdio: "inherit" });
 
   console.log("Build complete → dist/");

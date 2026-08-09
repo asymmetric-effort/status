@@ -38,7 +38,7 @@ describe("ServiceCard", () => {
       message: "Running smoothly",
       updated: new Date().toISOString(),
     };
-    const html = renderToString(createElement(ServiceCard as any, { service }));
+    const html = renderToString(createElement(ServiceCard as any, { service, onClick: () => {} }));
     expect(html).toContain("API Gateway");
   });
 
@@ -49,7 +49,7 @@ describe("ServiceCard", () => {
       message: "High latency detected",
       updated: new Date().toISOString(),
     };
-    const html = renderToString(createElement(ServiceCard as any, { service }));
+    const html = renderToString(createElement(ServiceCard as any, { service, onClick: () => {} }));
     expect(html).toContain("High latency detected");
   });
 
@@ -60,7 +60,7 @@ describe("ServiceCard", () => {
       message: "Connection failed",
       updated: new Date().toISOString(),
     };
-    const html = renderToString(createElement(ServiceCard as any, { service }));
+    const html = renderToString(createElement(ServiceCard as any, { service, onClick: () => {} }));
     expect(html).toContain("service-card-down");
   });
 
@@ -72,7 +72,7 @@ describe("ServiceCard", () => {
         message: "Test message",
         updated: new Date().toISOString(),
       };
-      const html = renderToString(createElement(ServiceCard as any, { service }));
+      const html = renderToString(createElement(ServiceCard as any, { service, onClick: () => {} }));
       expect(html).toContain(`service-card-${status}`);
     }
   });

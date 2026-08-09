@@ -19,12 +19,12 @@ const distDir = resolve(import.meta.dirname, "..", "dist");
 const server = createServer((req, res) => {
   let url = req.url === "/" ? "/index.html" : req.url || "/index.html";
 
-  // /json endpoint: serve status.json with correct content type
+  // /json endpoint: serve combined status+history JSON
   if (url === "/json" || url === "/json/") {
-    const jsonPath = resolve(distDir, "status.json");
-    if (existsSync(jsonPath)) {
+    const jsonEndpoint = resolve(distDir, "json/index.html");
+    if (existsSync(jsonEndpoint)) {
       res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(readFileSync(jsonPath));
+      res.end(readFileSync(jsonEndpoint));
       return;
     }
   }

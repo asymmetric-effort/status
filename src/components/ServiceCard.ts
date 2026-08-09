@@ -4,6 +4,7 @@ import { StatusBadge } from "./StatusBadge.ts";
 
 interface ServiceCardProps {
   service: Service;
+  onClick: () => void;
 }
 
 function formatRelativeTime(iso: string): string {
@@ -28,8 +29,13 @@ function formatRelativeTime(iso: string): string {
 
 export { formatRelativeTime };
 
-export function ServiceCard({ service }: ServiceCardProps) {
-  return createElement("div", { className: `service-card service-card-${service.status}` },
+export function ServiceCard({ service, onClick }: ServiceCardProps) {
+  return createElement("div", {
+      className: `service-card service-card-${service.status}`,
+      onClick,
+      role: "button",
+      tabIndex: 0,
+    },
     createElement("div", { className: "service-info" },
       createElement("span", { className: "service-name" }, service.name),
       createElement("span", { className: "service-message" }, service.message)

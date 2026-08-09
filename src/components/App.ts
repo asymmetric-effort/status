@@ -1,11 +1,25 @@
-import { createElement } from "@asymmetric-effort/specifyjs";
+import { createElement, useState, useCallback } from "@asymmetric-effort/specifyjs";
 import { useStatus } from "../hooks/useStatus.ts";
+import { useHistory } from "../hooks/useHistory.ts";
+import { useVersion } from "../hooks/useVersion.ts";
 import { Header } from "./Header.ts";
 import { ServiceCard } from "./ServiceCard.ts";
+import { Histogram } from "./Histogram.ts";
 import { Footer } from "./Footer.ts";
 
 export function App() {
   const { data, error, loading } = useStatus();
+  const history = useHistory();
+  const { version } = useVersion();
+  const [selectedService, setSelectedService] = useState<string | null>(null);
+
+  const handleServiceClick = useCallback((name: string) => {
+    setSelectedService(name);
+  }, []);
+
+  const handleCloseHistogram = useCallback(() => {
+    setSelectedService(null);
+  }, []);
 
   if (loading) {
     return createElement("div", { className: "container" },
@@ -27,17 +41,33 @@ export function App() {
 
   const hasServices = data.services.length > 0;
 
+  const showHistogram = selectedService
+    && history.data
+    && history.data.services[selectedService];
+
   return createElement("div", { className: "container" },
     createElement(Header as any, { title: data.title || "Balefire Status", services: data.services }),
     hasServices
       ? createElement("main", { className: "services" },
           ...data.services.map((service) =>
-            createElement(ServiceCard as any, { key: service.name, service })
+            createElement(ServiceCard as any, {
+              key: service.name,
+              service,
+              onClick: () => handleServiceClick(service.name),
+            })
           )
         )
       : createElement("main", { className: "services" },
           createElement("div", { className: "no-services" }, "No services configured.")
         ),
-    createElement(Footer as any, null)
+    showHistogram
+      ? createElement(Histogram as any, {
+          serviceName: selectedService,
+          hours: history.data!.services[selectedService!],
+          startTime: history.data!.startTime,
+          onClose: handleCloseHistogram,
+        })
+      : null,
+    createElement(Footer as any, { version })
   );
 }

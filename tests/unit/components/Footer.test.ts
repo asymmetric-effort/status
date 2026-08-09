@@ -5,22 +5,30 @@ import { Footer } from "../../../src/components/Footer.ts";
 
 describe("Footer", () => {
   it("renders copyright text", () => {
-    const html = renderToString(createElement(Footer as any, null));
-    expect(html).toContain("\u00A9 2025 Asymmetric Effort, LLC. MIT LICENSE");
+    const html = renderToString(createElement(Footer as any, { version: "v0.0.0" }));
+    expect(html).toContain("2025");
+    expect(html).toContain("MIT LICENSE");
   });
 
   it("renders a footer element", () => {
-    const html = renderToString(createElement(Footer as any, null));
+    const html = renderToString(createElement(Footer as any, { version: "v0.0.0" }));
     expect(html).toContain("<footer");
   });
 
-  it("includes the year 2025", () => {
-    const html = renderToString(createElement(Footer as any, null));
-    expect(html).toContain("2025");
+  it("links Asymmetric Effort to their website", () => {
+    const html = renderToString(createElement(Footer as any, { version: "v0.0.0" }));
+    expect(html).toContain("https://asymmetric-effort.com");
+    expect(html).toContain("Asymmetric Effort, LLC");
   });
 
-  it("includes MIT LICENSE", () => {
-    const html = renderToString(createElement(Footer as any, null));
-    expect(html).toContain("MIT LICENSE");
+  it("opens link in new tab", () => {
+    const html = renderToString(createElement(Footer as any, { version: "v0.0.0" }));
+    expect(html).toContain('target="_blank"');
+  });
+
+  it("renders the version", () => {
+    const html = renderToString(createElement(Footer as any, { version: "v1.2.3" }));
+    expect(html).toContain("v1.2.3");
+    expect(html).toContain("footer-version");
   });
 });

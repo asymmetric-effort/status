@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "code-review-graph": {
+      "command": "/home/claude/.venv/bin/python3",
+      "args": [
+        "-m",
+        "code_review_graph",
+        "serve"
+      ],
+      "cwd": "/home/claude/git/bailfire",
+      "type": "stdio"
+    }
+  }
+}

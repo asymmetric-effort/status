@@ -68,21 +68,14 @@ function main(): void {
   const yamlPath = resolve(rootDir, "status.yaml");
   const distDir = resolve(rootDir, "dist");
   const jsonPath = resolve(distDir, "status.json");
-  const jsonEndpointDir = resolve(distDir, "json");
 
   const content = readFileSync(yamlPath, "utf-8");
   const data = parseStatusYaml(content);
-  const jsonOutput = JSON.stringify(data, null, 2) + "\n";
 
   mkdirSync(distDir, { recursive: true });
-  mkdirSync(jsonEndpointDir, { recursive: true });
+  writeFileSync(jsonPath, JSON.stringify(data, null, 2) + "\n");
 
-  writeFileSync(jsonPath, jsonOutput);
-
-  // /json endpoint: copy as extensionless file for /json path
-  writeFileSync(resolve(jsonEndpointDir, "index.html"), jsonOutput);
-
-  console.log(`Converted status.yaml → dist/status.json + dist/json/ (${data.services.length} services)`);
+  console.log(`Converted status.yaml → dist/status.json (${data.services.length} services)`);
 }
 
 export { parseStatusYaml };

@@ -61,12 +61,30 @@ describe("build output", () => {
     }
   });
 
-  it("produces /json endpoint", () => {
+  it("produces /json endpoint with status, history, and version", () => {
     const jsonEndpoint = resolve(distDir, "json/index.html");
     expect(existsSync(jsonEndpoint)).toBe(true);
     const content = readFileSync(jsonEndpoint, "utf-8");
     const data = JSON.parse(content);
     expect(data.title).toBeDefined();
+    expect(data.version).toBeDefined();
     expect(Array.isArray(data.services)).toBe(true);
+    expect(data.history).toBeDefined();
+    expect(data.history.totalHours).toBe(2160);
+  });
+
+  it("produces history.json", () => {
+    const historyPath = resolve(distDir, "history.json");
+    expect(existsSync(historyPath)).toBe(true);
+    const data = JSON.parse(readFileSync(historyPath, "utf-8"));
+    expect(data.totalHours).toBe(2160);
+    expect(data.services).toBeDefined();
+  });
+
+  it("produces version.json", () => {
+    const versionPath = resolve(distDir, "version.json");
+    expect(existsSync(versionPath)).toBe(true);
+    const data = JSON.parse(readFileSync(versionPath, "utf-8"));
+    expect(data.version).toBeDefined();
   });
 });
