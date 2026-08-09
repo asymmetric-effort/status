@@ -57,6 +57,35 @@ test.describe("Status Page PDV", () => {
     }
   });
 
+  test("history.json contains histogram data with non-empty service history", async ({ request }) => {
+    const res = await request.get("/history.json");
+    expect(res.ok()).toBeTruthy();
+    const data = await res.json();
+    expect(data).toHaveProperty("startTime");
+    expect(data).toHaveProperty("totalHours");
+    expect(data.totalHours).toBe(2160);
+    expect(data).toHaveProperty("services");
+
+    const serviceNames = Object.keys(data.services);
+    expect(serviceNames.length).toBeGreaterThan(0);
+
+    // At least one service must have non-no-data entries
+    let hasRealData = false;
+    for (const name of serviceNames) {
+      const hours: string[] = data.services[name];
+      expect(hours).toHaveLength(2160);
+      const realEntries = hours.filter((s: string) => s !== "no-data");
+      if (realEntries.length > 0) {
+        hasRealData = true;
+        // All entries must be valid status values
+        for (const entry of hours) {
+          expect(["operational", "degraded", "down", "no-data"]).toContain(entry);
+        }
+      }
+    }
+    expect(hasRealData).toBeTruthy();
+  });
+
   test("page renders at mobile viewport", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/");
