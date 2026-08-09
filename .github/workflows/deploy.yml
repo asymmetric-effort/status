@@ -3,7 +3,14 @@ name: Deploy Status Page
 on:
   push:
     branches: [main]
-    paths: [status.yaml]
+    paths:
+      - status.yaml
+      - src/**
+      - scripts/**
+      - index.html
+      - package.json
+      - package-lock.json
+      - tsconfig.build.json
   workflow_dispatch:
 
 permissions:
