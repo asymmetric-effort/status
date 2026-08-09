@@ -6,7 +6,7 @@ on:
     paths:
       - "src/**"
       - "scripts/**"
-      - "status.yaml"
+      - "data/status.yaml.gpg"
       - "package.json"
       - "package-lock.json"
       - "tsconfig.json"

@@ -1,6 +1,6 @@
-# Contributing to Bailfire
+# Contributing to BaleFire
 
-Thank you for your interest in contributing to Bailfire.
+Thank you for your interest in contributing to BaleFire.
 
 ## Getting Started
 

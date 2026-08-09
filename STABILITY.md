@@ -1,6 +1,6 @@
 # API Stability Policy
 
-Bailfire follows [Semantic Versioning 2.0.0](https://semver.org/).
+BaleFire follows [Semantic Versioning 2.0.0](https://semver.org/).
 
 ## Versioning
 

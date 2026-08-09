@@ -2,7 +2,7 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in Bailfire, please report it responsibly.
+If you discover a security vulnerability in BaleFire, please report it responsibly.
 
 **Do NOT open a public issue for security vulnerabilities.**
 

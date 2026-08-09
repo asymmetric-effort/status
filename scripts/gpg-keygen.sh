@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Generate a PQC composite GPG keypair for Balefire subscriber encryption.
+# Generate a PQC composite GPG keypair for BaleFire subscriber encryption.
 #
 # Creates a composite key:
 #   Primary:    ed25519 + ML-DSA-65 (signing)
 #   Subkey:     cv25519 + ML-KEM-768 (encryption)
 #
 # Usage:
-#   ./scripts/gpg-keygen.sh --name "Balefire Status" --email "status@example.com"
+#   ./scripts/gpg-keygen.sh --name "BaleFire Status" --email "status@example.com"
 #
 # The public key is exported to subscribers/subscribers.gpg.pub
 # The private key must be stored in GitHub secrets as GPG_PRIVATE_KEY
@@ -29,7 +29,7 @@ while [[ $# -gt 0 ]]; do
     --help|-h)
       echo "Usage: gpg-keygen.sh --name <name> --email <email>"
       echo ""
-      echo "Generates a PQC composite GPG keypair for Balefire."
+      echo "Generates a PQC composite GPG keypair for BaleFire."
       echo "  Primary: ed25519 + ML-DSA-65 (signing)"
       echo "  Subkey:  cv25519 + ML-KEM-768 (encryption)"
       exit 0
