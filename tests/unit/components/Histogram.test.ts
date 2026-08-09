@@ -1,5 +1,5 @@
 import { describe, it, expect } from "@asymmetric-effort/nogginlessdom";
-import { getDayStatus, STATUS_LABELS, STATUS_COLORS } from "../../../src/components/Histogram.ts";
+import { getDayStatus, STATUS_LABELS } from "../../../src/components/Histogram.ts";
 import { renderToString } from "@asymmetric-effort/specifyjs/server";
 import { createElement } from "@asymmetric-effort/specifyjs";
 import { Histogram } from "../../../src/components/Histogram.ts";
@@ -36,12 +36,19 @@ describe("STATUS_LABELS", () => {
   });
 });
 
-describe("STATUS_COLORS", () => {
-  it("has colors for all statuses", () => {
-    expect(STATUS_COLORS["operational"]).toBeDefined();
-    expect(STATUS_COLORS["degraded"]).toBeDefined();
-    expect(STATUS_COLORS["down"]).toBeDefined();
-    expect(STATUS_COLORS["no-data"]).toBeDefined();
+describe("Histogram legend swatches", () => {
+  it("renders legend swatches with pattern classes", () => {
+    const mockHours: HistogramStatus[] = new Array(2160).fill("operational");
+    const html = renderToString(createElement(Histogram as any, {
+      serviceName: "Web",
+      hours: mockHours,
+      startTime: "2026-05-11T00:00:00Z",
+      onClose: () => {},
+    }));
+    expect(html).toContain("histogram-legend-swatch histogram-operational");
+    expect(html).toContain("histogram-legend-swatch histogram-degraded");
+    expect(html).toContain("histogram-legend-swatch histogram-down");
+    expect(html).toContain("histogram-legend-swatch histogram-no-data");
   });
 });
 

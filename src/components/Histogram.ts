@@ -88,8 +88,7 @@ export function Histogram({ serviceName, hours, startTime, onClose }: HistogramP
         ...Object.entries(STATUS_LABELS).map(([status, label]) =>
           createElement("div", { key: status, className: "histogram-legend-item" },
             createElement("span", {
-              className: "histogram-legend-color",
-              style: `background:${STATUS_COLORS[status as HistogramStatus]}`,
+              className: `histogram-legend-swatch histogram-${status}`,
             }),
             createElement("span", null, label)
           )
@@ -99,4 +98,4 @@ export function Histogram({ serviceName, hours, startTime, onClose }: HistogramP
   );
 }
 
-export { getDayStatus, STATUS_LABELS, STATUS_COLORS };
+export { getDayStatus, STATUS_LABELS };
