@@ -306,17 +306,54 @@ body {
   margin-bottom: 1rem;
 }
 
+.histogram-chart-container {
+  overflow-x: auto;
+  margin-bottom: 0.5rem;
+  position: relative;
+  scrollbar-width: thin;
+  direction: rtl;
+}
+
+.histogram-chart-container > * {
+  direction: ltr;
+}
+
+.histogram-chart-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.histogram-chart-container::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
 .histogram-chart {
   display: flex;
   gap: 1px;
-  height: 2rem;
-  margin-bottom: 0.5rem;
+  height: 2.5rem;
+  width: max-content;
 }
 
 .histogram-bar {
-  flex: 1;
-  border-radius: 2px;
-  min-width: 1px;
+  width: 4px;
+  flex-shrink: 0;
+  border-radius: 1px;
+}
+
+.histogram-date-markers {
+  position: relative;
+  height: 1.25rem;
+  width: max-content;
+  min-width: 100%;
+}
+
+.histogram-date-label {
+  position: absolute;
+  top: 0.25rem;
+  font-size: 0.625rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  transform: translateX(-50%);
 }
 
 .histogram-operational {
