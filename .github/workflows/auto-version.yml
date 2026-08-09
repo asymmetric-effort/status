@@ -24,7 +24,7 @@ jobs:
         with:
           fetch-depth: 0
           fetch-tags: true
-          token: ${{ secrets['balefire-auto-version'] }}
+          token: ${{ secrets.STATUS_AUTO_VERSION_PAT }}
 
       - uses: actions/setup-node@v7
         with:
