@@ -67,6 +67,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     git \
     jq \
+    make \
     ca-certificates \
     pinentry-tty \
     && rm -rf /var/lib/apt/lists/*

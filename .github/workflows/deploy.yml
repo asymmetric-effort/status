@@ -18,13 +18,41 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  packages: read
 
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
+  decrypt:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/asymmetric-effort/status/runner:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Decrypt status.yaml
+        run: |
+          if [ -f data/status.yaml.gpg ]; then
+            echo "${{ secrets.STATUS_GPG_PRIVATE_KEY }}" | gpg --batch --import
+            gpg --batch --yes --decrypt --output status.yaml data/status.yaml.gpg
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: decrypted-status
+          path: status.yaml
+          retention-days: 1
+
   build-and-deploy:
+    needs: decrypt
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -35,24 +63,16 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
+      - uses: actions/download-artifact@v4
+        with:
+          name: decrypted-status
+
       - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
 
       - run: npm ci
-
-      - name: Decrypt status.yaml (if encrypted)
-        run: |
-          if [ -f data/status.yaml.gpg ]; then
-            echo "${{ secrets.STATUS_GPG_PRIVATE_KEY }}" | gpg --batch --import
-            gpg --batch --yes --decrypt --output status.yaml data/status.yaml.gpg
-          elif [ -f status.yaml ]; then
-            echo "Using plaintext status.yaml (encryption not initialized)"
-          else
-            echo "ERROR: No status.yaml or data/status.yaml.gpg found"
-            exit 1
-          fi
 
       - run: make build
 

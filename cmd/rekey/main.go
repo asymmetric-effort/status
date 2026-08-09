@@ -17,8 +17,8 @@ status page project. The public key is stored in data/ and the private
 key is stored in GitHub Secrets.
 
 All keypairs use PQC composite algorithms:
-  Signing:    ed25519 + ML-DSA-65
-  Encryption: cv25519 + ML-KEM-768`,
+  Signing:    ed25519
+  Encryption: Kyber-768 (PQC composite)`,
 }
 
 func init() {
