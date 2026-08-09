@@ -6,19 +6,43 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
     bzip2 \
-    libgpg-error-dev \
-    libgcrypt-dev \
-    libksba-dev \
-    libnpth0-dev \
     zlib1g-dev \
     libbz2-dev \
     libsqlite3-dev \
     libreadline-dev \
     libldap2-dev \
+    libnpth0-dev \
     texinfo \
     && rm -rf /var/lib/apt/lists/*
 
-# Build libassuan 3.0.2 (Ubuntu 24.04 ships 2.x, GnuPG 2.5.20 needs 3.x)
+ENV PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+ENV LD_LIBRARY_PATH=/usr/local/lib
+
+# Build libgpg-error 1.56
+RUN curl -sL https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.56.tar.bz2 -o /tmp/libgpg-error.tar.bz2 \
+    && cd /tmp && tar xjf libgpg-error.tar.bz2 && cd libgpg-error-1.56 \
+    && ./configure --prefix=/usr/local \
+    && make -j$(nproc) \
+    && make install \
+    && ldconfig
+
+# Build libgcrypt 1.11.0
+RUN curl -sL https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.11.0.tar.bz2 -o /tmp/libgcrypt.tar.bz2 \
+    && cd /tmp && tar xjf libgcrypt.tar.bz2 && cd libgcrypt-1.11.0 \
+    && ./configure --prefix=/usr/local \
+    && make -j$(nproc) \
+    && make install \
+    && ldconfig
+
+# Build libksba 1.7.0
+RUN curl -sL https://gnupg.org/ftp/gcrypt/libksba/libksba-1.7.0.tar.bz2 -o /tmp/libksba.tar.bz2 \
+    && cd /tmp && tar xjf libksba.tar.bz2 && cd libksba-1.7.0 \
+    && ./configure --prefix=/usr/local \
+    && make -j$(nproc) \
+    && make install \
+    && ldconfig
+
+# Build libassuan 3.0.2
 RUN curl -sL https://gnupg.org/ftp/gcrypt/libassuan/libassuan-3.0.2.tar.bz2 -o /tmp/libassuan.tar.bz2 \
     && cd /tmp && tar xjf libassuan.tar.bz2 && cd libassuan-3.0.2 \
     && ./configure --prefix=/usr/local \
@@ -26,9 +50,7 @@ RUN curl -sL https://gnupg.org/ftp/gcrypt/libassuan/libassuan-3.0.2.tar.bz2 -o /
     && make install \
     && ldconfig
 
-# Build GnuPG 2.5.20
-ENV PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
-ENV LD_LIBRARY_PATH=/usr/local/lib
+# Build GnuPG 2.5.21
 RUN curl -sL https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.5.21.tar.bz2 -o /tmp/gnupg.tar.bz2 \
     && cd /tmp && tar xjf gnupg.tar.bz2 && cd gnupg-2.5.21 \
     && ./configure --prefix=/usr/local \
@@ -41,7 +63,6 @@ FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install runtime deps — use apt to find correct package names for Noble
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     git \
@@ -50,20 +71,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pinentry-tty \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy built libassuan, GnuPG, and their runtime deps from builder
-COPY --from=gpg-builder /usr/local/lib/libassuan* /usr/local/lib/
-COPY --from=gpg-builder /usr/local/bin/gpg /usr/local/bin/gpg
-COPY --from=gpg-builder /usr/local/bin/gpg-agent /usr/local/bin/gpg-agent
-COPY --from=gpg-builder /usr/local/bin/gpgconf /usr/local/bin/gpgconf
-COPY --from=gpg-builder /usr/local/bin/gpgsm /usr/local/bin/gpgsm
-COPY --from=gpg-builder /usr/local/bin/kbxutil /usr/local/bin/kbxutil
+# Copy all built libraries and binaries from builder
+COPY --from=gpg-builder /usr/local/lib/ /usr/local/lib/
+COPY --from=gpg-builder /usr/local/bin/ /usr/local/bin/
 COPY --from=gpg-builder /usr/local/libexec/ /usr/local/libexec/
-
-# Copy runtime shared libs that GPG needs from the builder
-COPY --from=gpg-builder /usr/lib/x86_64-linux-gnu/libgpg-error.so* /usr/lib/x86_64-linux-gnu/
-COPY --from=gpg-builder /usr/lib/x86_64-linux-gnu/libgcrypt.so* /usr/lib/x86_64-linux-gnu/
-COPY --from=gpg-builder /usr/lib/x86_64-linux-gnu/libksba.so* /usr/lib/x86_64-linux-gnu/
-COPY --from=gpg-builder /usr/lib/x86_64-linux-gnu/libnpth.so* /usr/lib/x86_64-linux-gnu/
 
 RUN ldconfig
 
