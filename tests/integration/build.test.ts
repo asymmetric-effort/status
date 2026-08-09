@@ -61,16 +61,15 @@ describe("build output", () => {
     }
   });
 
-  it("produces /json endpoint with status, history, and version", () => {
-    const jsonEndpoint = resolve(distDir, "json/index.html");
-    expect(existsSync(jsonEndpoint)).toBe(true);
-    const content = readFileSync(jsonEndpoint, "utf-8");
+  it("produces status.json with status, history, messages, and version", () => {
+    const content = readFileSync(resolve(distDir, "status.json"), "utf-8");
     const data = JSON.parse(content);
     expect(data.title).toBeDefined();
     expect(data.version).toBeDefined();
     expect(Array.isArray(data.services)).toBe(true);
     expect(data.history).toBeDefined();
     expect(data.history.totalHours).toBe(2160);
+    expect(data.history.messages).toBeDefined();
   });
 
   it("produces history.json", () => {

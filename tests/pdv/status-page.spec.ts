@@ -40,19 +40,24 @@ test.describe("Status Page PDV", () => {
     expect(Array.isArray(data.services)).toBeTruthy();
   });
 
-  test("/json endpoint returns valid status data", async ({ request }) => {
-    const res = await request.get("/json");
+  test("/status.json returns complete data with application/json", async ({ request }) => {
+    const res = await request.get("/status.json");
     expect(res.ok()).toBeTruthy();
-    const body = await res.text();
-    const data = JSON.parse(body);
+    expect(res.headers()["content-type"]).toContain("application/json");
+    const data = await res.json();
+    expect(data).toHaveProperty("version");
     expect(data).toHaveProperty("title");
     expect(data).toHaveProperty("services");
+    expect(data).toHaveProperty("history");
     expect(Array.isArray(data.services)).toBeTruthy();
     for (const svc of data.services) {
       expect(svc).toHaveProperty("name");
       expect(svc).toHaveProperty("status");
       expect(svc).toHaveProperty("message");
       expect(svc).toHaveProperty("updated");
+    }
+    if (data.history) {
+      expect(data.history).toHaveProperty("messages");
     }
   });
 

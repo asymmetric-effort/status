@@ -1,10 +1,9 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 
 function main(): void {
   const rootDir = resolve(import.meta.dirname, "..");
   const distDir = resolve(rootDir, "dist");
-  const jsonEndpointDir = resolve(distDir, "json");
 
   const statusPath = resolve(distDir, "status.json");
   const historyPath = resolve(distDir, "history.json");
@@ -34,11 +33,10 @@ function main(): void {
     } : null,
   };
 
-  mkdirSync(jsonEndpointDir, { recursive: true });
   const output = JSON.stringify(combined, null, 2) + "\n";
-  writeFileSync(resolve(jsonEndpointDir, "index.html"), output);
+  writeFileSync(statusPath, output);
 
-  console.log("Built /json endpoint with status + history data.");
+  console.log("Built /status.json with status + history + messages + version.");
 }
 
 const isMain = process.argv[1]?.endsWith("build-json-endpoint.ts");
