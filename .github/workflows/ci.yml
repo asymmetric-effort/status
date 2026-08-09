@@ -9,16 +9,16 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/asymmetric-effort/status/runner:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           fetch-tags: true
-
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          cache: npm
 
       - run: npm ci
 
