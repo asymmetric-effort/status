@@ -1,6 +1,6 @@
 {
   "name": "bailfire",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Minimal status page built on GitHub Pages",
   "type": "module",
   "private": true,
