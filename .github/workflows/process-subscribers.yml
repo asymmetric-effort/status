@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "subscribers/raw/**"
+      - "subscribers/raw/*.gpg"
 
 permissions:
   contents: write
@@ -24,6 +24,17 @@ jobs:
           cache: npm
 
       - run: npm ci
+
+      - name: Install GnuPG 2.5.20+ for PQC
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libgpg-error-dev libgcrypt-dev libassuan-dev libksba-dev libnpth0-dev
+          curl -sL https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.5.20.tar.bz2 -o /tmp/gnupg.tar.bz2
+          cd /tmp && tar xjf gnupg.tar.bz2 && cd gnupg-2.5.20
+          ./configure --prefix=/usr/local
+          make -j$(nproc)
+          sudo make install
+          hash -r
 
       - name: Check GnuPG version
         run: bash scripts/check-gpg.sh
