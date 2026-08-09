@@ -4,8 +4,8 @@ set -euo pipefail
 # Generate a PQC composite GPG keypair for BaleFire subscriber encryption.
 #
 # Creates a composite key:
-#   Primary:    ed25519 + ML-DSA-65 (signing)
-#   Subkey:     cv25519 + ML-KEM-768 (encryption)
+#   Primary:    ed25519 (signing)
+#   Subkey:     Kyber-768 (PQC composite) (encryption)
 #
 # Usage:
 #   ./scripts/gpg-keygen.sh --name "BaleFire Status" --email "status@example.com"
@@ -30,8 +30,8 @@ while [[ $# -gt 0 ]]; do
       echo "Usage: gpg-keygen.sh --name <name> --email <email>"
       echo ""
       echo "Generates a PQC composite GPG keypair for BaleFire."
-      echo "  Primary: ed25519 + ML-DSA-65 (signing)"
-      echo "  Subkey:  cv25519 + ML-KEM-768 (encryption)"
+      echo "  Primary: ed25519 (signing)"
+      echo "  Subkey:  Kyber-768 (PQC composite) (encryption)"
       exit 0
       ;;
     *) echo "Unknown option: $1"; exit 1 ;;
@@ -47,12 +47,12 @@ fi
 echo "Generating PQC composite keypair..."
 echo "  Name:  $NAME"
 echo "  Email: $EMAIL"
-echo "  Sign:  ed25519 + ML-DSA-65"
-echo "  Encrypt: cv25519 + ML-KEM-768"
+echo "  Sign:  ed25519"
+echo "  Encrypt: Kyber-768 (PQC composite)"
 echo ""
 
 # Generate primary key (signing): ed25519 composite with ML-DSA-65
-gpg --batch --passphrase "" --quick-gen-key "$NAME <$EMAIL>" ed25519+ml-dsa-65 sign 0
+gpg --batch --passphrase "" --quick-gen-key "$NAME <$EMAIL>" ed25519 sign 0
 
 # Get the fingerprint of the key we just created
 FINGERPRINT=$(gpg --list-keys --with-colons "$EMAIL" 2>/dev/null | grep "^fpr:" | head -1 | cut -d: -f10)
@@ -65,7 +65,7 @@ fi
 echo "Primary key fingerprint: $FINGERPRINT"
 
 # Add encryption subkey: cv25519 composite with ML-KEM-768
-gpg --batch --passphrase "" --quick-add-key "$FINGERPRINT" cv25519+ml-kem-768 encr 0
+gpg --batch --passphrase "" --quick-add-key "$FINGERPRINT" kyber encr 0
 
 echo ""
 echo "Keypair generated successfully."

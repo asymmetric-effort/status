@@ -191,7 +191,7 @@ func generateKeypair(days int) (string, error) {
 	// Generate primary key (signing)
 	uid := "BaleFire Status <status@balefire.local>"
 	cmd := exec.Command("gpg", "--batch", "--passphrase", "",
-		"--quick-gen-key", uid, "ed25519+ml-dsa-65", "sign", expiry)
+		"--quick-gen-key", uid, "ed25519", "sign", expiry)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
@@ -220,7 +220,7 @@ func generateKeypair(days int) (string, error) {
 
 	// Add encryption subkey
 	cmd = exec.Command("gpg", "--batch", "--passphrase", "",
-		"--quick-add-key", fingerprint, "cv25519+ml-kem-768", "encr", expiry)
+		"--quick-add-key", fingerprint, "kyber", "encr", expiry)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
