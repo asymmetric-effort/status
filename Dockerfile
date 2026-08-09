@@ -39,29 +39,29 @@ FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y \
+# Install runtime deps — use apt to find correct package names for Noble
+RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     git \
     jq \
-    libgpg-error0 \
-    libgcrypt20 \
-    libksba8 \
-    libnpth0 \
-    libreadline8 \
-    libsqlite3-0 \
-    libldap-2.5-0 \
+    ca-certificates \
     pinentry-tty \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy built libassuan and GnuPG from builder
+# Copy built libassuan, GnuPG, and their runtime deps from builder
 COPY --from=gpg-builder /usr/local/lib/libassuan* /usr/local/lib/
 COPY --from=gpg-builder /usr/local/bin/gpg /usr/local/bin/gpg
 COPY --from=gpg-builder /usr/local/bin/gpg-agent /usr/local/bin/gpg-agent
 COPY --from=gpg-builder /usr/local/bin/gpgconf /usr/local/bin/gpgconf
 COPY --from=gpg-builder /usr/local/bin/gpgsm /usr/local/bin/gpgsm
 COPY --from=gpg-builder /usr/local/bin/kbxutil /usr/local/bin/kbxutil
-COPY --from=gpg-builder /usr/local/libexec/scdaemon /usr/local/libexec/scdaemon
-COPY --from=gpg-builder /usr/local/libexec/keyboxd /usr/local/libexec/keyboxd
+COPY --from=gpg-builder /usr/local/libexec/ /usr/local/libexec/
+
+# Copy runtime shared libs that GPG needs from the builder
+COPY --from=gpg-builder /usr/lib/x86_64-linux-gnu/libgpg-error.so* /usr/lib/x86_64-linux-gnu/
+COPY --from=gpg-builder /usr/lib/x86_64-linux-gnu/libgcrypt.so* /usr/lib/x86_64-linux-gnu/
+COPY --from=gpg-builder /usr/lib/x86_64-linux-gnu/libksba.so* /usr/lib/x86_64-linux-gnu/
+COPY --from=gpg-builder /usr/lib/x86_64-linux-gnu/libnpth.so* /usr/lib/x86_64-linux-gnu/
 
 RUN ldconfig
 
