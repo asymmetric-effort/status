@@ -41,6 +41,22 @@ test.describe("Status Page PDV", () => {
     expect(Array.isArray(data.services)).toBeTruthy();
   });
 
+  test("/json endpoint returns valid status data", async ({ request }) => {
+    const res = await request.get("/json");
+    expect(res.ok()).toBeTruthy();
+    const body = await res.text();
+    const data = JSON.parse(body);
+    expect(data).toHaveProperty("title");
+    expect(data).toHaveProperty("services");
+    expect(Array.isArray(data.services)).toBeTruthy();
+    for (const svc of data.services) {
+      expect(svc).toHaveProperty("name");
+      expect(svc).toHaveProperty("status");
+      expect(svc).toHaveProperty("message");
+      expect(svc).toHaveProperty("updated");
+    }
+  });
+
   test("page renders at mobile viewport", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/");

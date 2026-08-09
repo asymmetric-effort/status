@@ -17,7 +17,18 @@ const port = parseInt(process.env.PORT || "8080", 10);
 const distDir = resolve(import.meta.dirname, "..", "dist");
 
 const server = createServer((req, res) => {
-  const url = req.url === "/" ? "/index.html" : req.url || "/index.html";
+  let url = req.url === "/" ? "/index.html" : req.url || "/index.html";
+
+  // /json endpoint: serve status.json with correct content type
+  if (url === "/json" || url === "/json/") {
+    const jsonPath = resolve(distDir, "status.json");
+    if (existsSync(jsonPath)) {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(readFileSync(jsonPath));
+      return;
+    }
+  }
+
   const filePath = resolve(distDir, url.slice(1));
 
   // Prevent directory traversal

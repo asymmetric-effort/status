@@ -60,4 +60,13 @@ describe("build output", () => {
       expect(existsSync(path)).toBe(true);
     }
   });
+
+  it("produces /json endpoint", () => {
+    const jsonEndpoint = resolve(distDir, "json/index.html");
+    expect(existsSync(jsonEndpoint)).toBe(true);
+    const content = readFileSync(jsonEndpoint, "utf-8");
+    const data = JSON.parse(content);
+    expect(data.title).toBeDefined();
+    expect(Array.isArray(data.services)).toBe(true);
+  });
 });
