@@ -5,6 +5,8 @@ interface HistogramProps {
   serviceName: string;
   hours: HistogramStatus[];
   startTime: string;
+  currentStatus: string;
+  currentMessage: string;
   onClose: () => void;
 }
 
@@ -35,7 +37,7 @@ function getDayStatus(hourStatuses: HistogramStatus[]): HistogramStatus {
   return "no-data";
 }
 
-export function Histogram({ serviceName, hours, startTime, onClose }: HistogramProps) {
+export function Histogram({ serviceName, hours, startTime, currentStatus, currentMessage, onClose }: HistogramProps) {
   const start = new Date(startTime);
 
   // Group hours into days (90 days)
@@ -93,6 +95,12 @@ export function Histogram({ serviceName, hours, startTime, onClose }: HistogramP
             createElement("span", null, label)
           )
         )
+      ),
+      createElement("div", { className: `histogram-message histogram-message-${currentStatus}` },
+        createElement("span", { className: "histogram-message-label" },
+          STATUS_LABELS[(currentStatus === "up" ? "operational" : currentStatus) as HistogramStatus] || currentStatus
+        ),
+        createElement("span", { className: "histogram-message-text" }, currentMessage)
       )
     )
   );

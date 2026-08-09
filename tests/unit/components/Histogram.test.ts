@@ -44,6 +44,8 @@ describe("Histogram legend swatches", () => {
       hours: mockHours,
       startTime: "2026-05-11T00:00:00Z",
       onClose: () => {},
+      currentStatus: "up",
+      currentMessage: "All systems operational",
     }));
     expect(html).toContain("histogram-legend-swatch histogram-operational");
     expect(html).toContain("histogram-legend-swatch histogram-degraded");
@@ -61,6 +63,8 @@ describe("Histogram component", () => {
       hours: mockHours,
       startTime: "2026-05-11T00:00:00Z",
       onClose: () => {},
+      currentStatus: "up",
+      currentMessage: "All systems operational",
     }));
     expect(html).toContain("API");
   });
@@ -71,6 +75,8 @@ describe("Histogram component", () => {
       hours: mockHours,
       startTime: "2026-05-11T00:00:00Z",
       onClose: () => {},
+      currentStatus: "up",
+      currentMessage: "All systems operational",
     }));
     expect(html).toContain("100.00%");
     expect(html).toContain("uptime");
@@ -82,6 +88,8 @@ describe("Histogram component", () => {
       hours: mockHours,
       startTime: "2026-05-11T00:00:00Z",
       onClose: () => {},
+      currentStatus: "up",
+      currentMessage: "All systems operational",
     }));
     const barCount = (html.match(/histogram-bar/g) || []).length;
     expect(barCount).toBe(90);
@@ -93,6 +101,8 @@ describe("Histogram component", () => {
       hours: mockHours,
       startTime: "2026-05-11T00:00:00Z",
       onClose: () => {},
+      currentStatus: "up",
+      currentMessage: "All systems operational",
     }));
     expect(html).toContain("Operational");
     expect(html).toContain("Degraded");
@@ -106,7 +116,37 @@ describe("Histogram component", () => {
       hours: mockHours,
       startTime: "2026-05-11T00:00:00Z",
       onClose: () => {},
+      currentStatus: "up",
+      currentMessage: "All systems operational",
     }));
     expect(html).toContain("histogram-close");
+  });
+
+  it("renders the current status message below the histogram", () => {
+    const html = renderToString(createElement(Histogram as any, {
+      serviceName: "TARDIS",
+      hours: mockHours,
+      startTime: "2026-05-11T00:00:00Z",
+      onClose: () => {},
+      currentStatus: "degraded",
+      currentMessage: "Temporal displacement circuits running slow",
+    }));
+    expect(html).toContain("histogram-message");
+    expect(html).toContain("Degraded");
+    expect(html).toContain("Temporal displacement circuits running slow");
+  });
+
+  it("renders status message for down services", () => {
+    const html = renderToString(createElement(Histogram as any, {
+      serviceName: "WOPR",
+      hours: mockHours,
+      startTime: "2026-05-11T00:00:00Z",
+      onClose: () => {},
+      currentStatus: "down",
+      currentMessage: "System offline",
+    }));
+    expect(html).toContain("histogram-message-down");
+    expect(html).toContain("Down");
+    expect(html).toContain("System offline");
   });
 });

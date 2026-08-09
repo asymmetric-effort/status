@@ -24,8 +24,30 @@ function getOverallStatus(services: Service[]): { label: string; className: stri
 
 export { getOverallStatus };
 
+function getLastUpdated(services: Service[]): string {
+  if (services.length === 0) return "";
+  let latest = "";
+  for (const svc of services) {
+    if (svc.updated > latest) latest = svc.updated;
+  }
+  if (!latest) return "";
+  const date = new Date(latest);
+  if (isNaN(date.getTime())) return "";
+  return date.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZoneName: "short",
+  });
+}
+
+export { getLastUpdated };
+
 export function Header({ title, services }: HeaderProps) {
   const overall = getOverallStatus(services);
+  const lastUpdated = getLastUpdated(services);
   return createElement("header", { className: "banner" },
     createElement("div", { className: "banner-brand" },
       createElement("svg", {
@@ -69,6 +91,9 @@ export function Header({ title, services }: HeaderProps) {
       ),
       createElement("h1", null, title),
     ),
-    createElement("div", { className: `overall-status ${overall.className}` }, overall.label)
+    createElement("div", { className: `overall-status ${overall.className}` }, overall.label),
+    lastUpdated
+      ? createElement("div", { className: "banner-updated" }, `Last updated: ${lastUpdated}`)
+      : null
   );
 }

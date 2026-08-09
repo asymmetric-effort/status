@@ -61,12 +61,17 @@ export function App() {
           createElement("div", { className: "no-services" }, "No services configured.")
         ),
     showHistogram
-      ? createElement(Histogram as any, {
-          serviceName: selectedService,
-          hours: history.data!.services[selectedService!],
-          startTime: history.data!.startTime,
-          onClose: handleCloseHistogram,
-        })
+      ? (() => {
+          const svc = data.services.find((s) => s.name === selectedService);
+          return createElement(Histogram as any, {
+            serviceName: selectedService,
+            hours: history.data!.services[selectedService!],
+            startTime: history.data!.startTime,
+            currentStatus: svc?.status || "up",
+            currentMessage: svc?.message || "",
+            onClose: handleCloseHistogram,
+          });
+        })()
       : null,
     createElement(Footer as any, { version })
   );
