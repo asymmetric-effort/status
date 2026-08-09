@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths:
+      - status.yaml
       - data/status.yaml.gpg
       - src/**
       - scripts/**
@@ -41,10 +42,17 @@ jobs:
 
       - run: npm ci
 
-      - name: Decrypt status.yaml
+      - name: Decrypt status.yaml (if encrypted)
         run: |
-          echo "${{ secrets.STATUS_GPG_PRIVATE_KEY }}" | gpg --batch --import
-          gpg --batch --yes --decrypt --output status.yaml data/status.yaml.gpg
+          if [ -f data/status.yaml.gpg ]; then
+            echo "${{ secrets.STATUS_GPG_PRIVATE_KEY }}" | gpg --batch --import
+            gpg --batch --yes --decrypt --output status.yaml data/status.yaml.gpg
+          elif [ -f status.yaml ]; then
+            echo "Using plaintext status.yaml (encryption not initialized)"
+          else
+            echo "ERROR: No status.yaml or data/status.yaml.gpg found"
+            exit 1
+          fi
 
       - run: make build
 
