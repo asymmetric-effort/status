@@ -4,15 +4,9 @@ import { createElement } from "@asymmetric-effort/specifyjs";
 import { Footer } from "../../../src/components/Footer.ts";
 
 describe("Footer", () => {
-  it("renders 'Powered by' text", () => {
+  it("renders copyright text", () => {
     const html = renderToString(createElement(Footer as any, null));
-    expect(html).toContain("Powered by");
-  });
-
-  it("renders a link to the Bailfire repo", () => {
-    const html = renderToString(createElement(Footer as any, null));
-    expect(html).toContain("Bailfire");
-    expect(html).toContain("https://github.com/asymmetric-effort/status");
+    expect(html).toContain("\u00A9 2025 Asymmetric Effort, LLC. MIT LICENSE");
   });
 
   it("renders a footer element", () => {
@@ -20,9 +14,13 @@ describe("Footer", () => {
     expect(html).toContain("<footer");
   });
 
-  it("opens link in new tab", () => {
+  it("includes the year 2025", () => {
     const html = renderToString(createElement(Footer as any, null));
-    expect(html).toContain('target="_blank"');
-    expect(html).toContain('rel="noopener noreferrer"');
+    expect(html).toContain("2025");
+  });
+
+  it("includes MIT LICENSE", () => {
+    const html = renderToString(createElement(Footer as any, null));
+    expect(html).toContain("MIT LICENSE");
   });
 });

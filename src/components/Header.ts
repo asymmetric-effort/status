@@ -26,8 +26,49 @@ export { getOverallStatus };
 
 export function Header({ title, services }: HeaderProps) {
   const overall = getOverallStatus(services);
-  return createElement("header", { className: "header" },
-    createElement("h1", null, title),
+  return createElement("header", { className: "banner" },
+    createElement("div", { className: "banner-brand" },
+      createElement("svg", {
+        className: "banner-icon",
+        viewBox: "0 0 48 48",
+        width: "40",
+        height: "40",
+        "aria-hidden": "true",
+      },
+        // Mountain (grey)
+        createElement("polygon", {
+          points: "4,44 24,16 44,44",
+          fill: "#9ca3af",
+        }),
+        createElement("polygon", {
+          points: "14,44 24,28 34,44",
+          fill: "#6b7280",
+        }),
+        // Fire (red/orange) on the peak
+        createElement("ellipse", {
+          cx: "24",
+          cy: "14",
+          rx: "6",
+          ry: "8",
+          fill: "#ef4444",
+        }),
+        createElement("ellipse", {
+          cx: "24",
+          cy: "12",
+          rx: "4",
+          ry: "6",
+          fill: "#f97316",
+        }),
+        createElement("ellipse", {
+          cx: "24",
+          cy: "10",
+          rx: "2",
+          ry: "4",
+          fill: "#fbbf24",
+        }),
+      ),
+      createElement("h1", null, title),
+    ),
     createElement("div", { className: `overall-status ${overall.className}` }, overall.label)
   );
 }

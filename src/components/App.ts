@@ -25,13 +25,19 @@ export function App() {
     );
   }
 
+  const hasServices = data.services.length > 0;
+
   return createElement("div", { className: "container" },
-    createElement(Header as any, { title: data.title, services: data.services }),
-    createElement("main", { className: "services" },
-      ...data.services.map((service) =>
-        createElement(ServiceCard as any, { key: service.name, service })
-      )
-    ),
+    createElement(Header as any, { title: data.title || "Balefire Status", services: data.services }),
+    hasServices
+      ? createElement("main", { className: "services" },
+          ...data.services.map((service) =>
+            createElement(ServiceCard as any, { key: service.name, service })
+          )
+        )
+      : createElement("main", { className: "services" },
+          createElement("div", { className: "no-services" }, "No services configured.")
+        ),
     createElement(Footer as any, null)
   );
 }

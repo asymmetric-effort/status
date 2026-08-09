@@ -45,16 +45,38 @@ body {
   padding: 2rem 1rem;
 }
 
-/* Header */
-.header {
+/* Banner */
+.banner {
   text-align: center;
   margin-bottom: 2rem;
 }
 
-.header h1 {
+.banner-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.banner-icon {
+  flex-shrink: 0;
+}
+
+.banner h1 {
   font-size: 1.5rem;
   font-weight: 600;
-  margin-bottom: 0.75rem;
+}
+
+/* No Services */
+.no-services {
+  text-align: center;
+  padding: 3rem 1rem;
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
 }
 
 .overall-status {

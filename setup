@@ -29,11 +29,11 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-echo "Setting up Bailfire for $URL..."
+echo "Setting up Balefire for $URL..."
 
 # Reset status.yaml to defaults
 cat > status.yaml <<EOF
-title: "System Status"
+title: "Balefire Status"
 url: "$URL"
 services: []
 EOF

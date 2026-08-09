@@ -56,13 +56,20 @@ describe("Header", () => {
     const services: Service[] = [
       { name: "Web", status: "up", message: "OK", updated: "2026-01-01T00:00:00Z" },
     ];
-    const html = renderToString(createElement(Header as any, { title: "My Status", services }));
-    expect(html).toContain("My Status");
+    const html = renderToString(createElement(Header as any, { title: "Balefire Status", services }));
+    expect(html).toContain("Balefire Status");
   });
 
-  it("renders a header element", () => {
+  it("renders a header element with banner class", () => {
     const html = renderToString(createElement(Header as any, { title: "Test", services: [] }));
     expect(html).toContain("<header");
+    expect(html).toContain("banner");
+  });
+
+  it("renders the fire-on-mountain SVG icon", () => {
+    const html = renderToString(createElement(Header as any, { title: "Test", services: [] }));
+    expect(html).toContain("<svg");
+    expect(html).toContain("banner-icon");
   });
 
   it("shows overall status text", () => {
@@ -71,5 +78,10 @@ describe("Header", () => {
     ];
     const html = renderToString(createElement(Header as any, { title: "Status", services }));
     expect(html).toContain("All Systems Operational");
+  });
+
+  it("shows No Services Configured for empty services", () => {
+    const html = renderToString(createElement(Header as any, { title: "Status", services: [] }));
+    expect(html).toContain("No Services Configured");
   });
 });
