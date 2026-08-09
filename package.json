@@ -22,7 +22,7 @@
     "@asymmetric-effort/steamroller": "^0.2.8",
     "@playwright/test": "^1.59.0",
     "@types/node": "^26.2.0",
-    "typescript": "^5.6.0"
+    "typescript": "^7.0.2"
   },
   "license": "MIT"
 }
