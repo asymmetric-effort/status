@@ -3,7 +3,9 @@ name: Notify
 on:
   push:
     branches: [main]
-    paths: [data/status.yaml.gpg]
+    paths:
+      - status.yaml
+      - data/status.yaml.gpg
 
 jobs:
   lint-and-notify:
@@ -18,10 +20,17 @@ jobs:
 
       - run: npm ci
 
-      - name: Decrypt status.yaml
+      - name: Decrypt status.yaml (if encrypted)
         run: |
-          echo "${{ secrets.STATUS_GPG_PRIVATE_KEY }}" | gpg --batch --import
-          gpg --batch --yes --decrypt --output status.yaml data/status.yaml.gpg
+          if [ -f data/status.yaml.gpg ]; then
+            echo "${{ secrets.STATUS_GPG_PRIVATE_KEY }}" | gpg --batch --import
+            gpg --batch --yes --decrypt --output status.yaml data/status.yaml.gpg
+          elif [ -f status.yaml ]; then
+            echo "Using plaintext status.yaml (encryption not initialized)"
+          else
+            echo "ERROR: No status.yaml or data/status.yaml.gpg found"
+            exit 1
+          fi
 
       - name: Lint status.yaml
         run: node --experimental-strip-types scripts/lint-status.ts
