@@ -22,6 +22,13 @@ jobs:
 
       - run: npm ci
 
+      - name: Decrypt status.yaml (if encrypted)
+        run: |
+          if [ -f data/status.yaml.gpg ]; then
+            echo "${{ secrets.STATUS_GPG_PRIVATE_KEY }}" | gpg --batch --import
+            gpg --batch --yes --decrypt --output status.yaml data/status.yaml.gpg
+          fi
+
       - run: make lint
 
       - run: make test
