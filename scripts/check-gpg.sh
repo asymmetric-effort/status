@@ -4,7 +4,7 @@ set -euo pipefail
 # Minimum GnuPG version required for PQC (ML-KEM, ML-DSA) support
 MIN_MAJOR=2
 MIN_MINOR=5
-MIN_PATCH=20
+MIN_PATCH=21
 
 # Required PQC algorithms
 REQUIRED_PK_ALGO="ML-KEM"
