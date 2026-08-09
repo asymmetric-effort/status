@@ -39,8 +39,8 @@ export function useStatus(): UseStatusResult {
 
     fetchStatus();
 
-    // Re-fetch every 60 seconds
-    const interval = setInterval(fetchStatus, 60000);
+    // Re-fetch every 15 seconds
+    const interval = setInterval(fetchStatus, 15000);
 
     return () => {
       cancelled = true;

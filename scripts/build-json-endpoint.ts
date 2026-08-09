@@ -30,6 +30,7 @@ function main(): void {
       totalHours: history.totalHours,
       generated: history.generated,
       services: history.services,
+      messages: history.messages,
     } : null,
   };
 
