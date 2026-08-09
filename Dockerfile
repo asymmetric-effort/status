@@ -27,6 +27,8 @@ RUN curl -sL https://gnupg.org/ftp/gcrypt/libassuan/libassuan-3.0.2.tar.bz2 -o /
     && ldconfig
 
 # Build GnuPG 2.5.20
+ENV PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+ENV LD_LIBRARY_PATH=/usr/local/lib
 RUN curl -sL https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.5.20.tar.bz2 -o /tmp/gnupg.tar.bz2 \
     && cd /tmp && tar xjf gnupg.tar.bz2 && cd gnupg-2.5.20 \
     && ./configure --prefix=/usr/local \
