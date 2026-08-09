@@ -1,0 +1,65 @@
+name: Process Subscribers
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "subscribers/raw/**"
+
+permissions:
+  contents: write
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Check GnuPG version
+        run: bash scripts/check-gpg.sh
+
+      - name: Import GPG private key
+        run: |
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+
+      - name: Validate PQC encryption on raw files
+        run: |
+          FAILED=0
+          for f in subscribers/raw/*.gpg; do
+            [ -f "$f" ] || continue
+            echo "Validating: $f"
+            if ! bash scripts/gpg-validate.sh "$f"; then
+              FAILED=1
+            fi
+          done
+          if [ "$FAILED" -eq 1 ]; then
+            echo "ERROR: One or more subscriber files failed PQC validation."
+            exit 1
+          fi
+
+      - name: Process raw subscriber files
+        run: node --experimental-strip-types scripts/process-subscribers.ts
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add subscribers/lists/ subscribers/raw/
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: process subscriber additions [skip ci]"
+            git push
+          fi
