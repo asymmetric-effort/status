@@ -46,7 +46,7 @@ export function App() {
     && history.data.services[selectedService];
 
   return createElement("div", { className: "container" },
-    createElement(Header as any, { title: data.title || "Balefire Status", services: data.services }),
+    createElement(Header as any, { title: data.title || "Status", services: data.services }),
     hasServices
       ? createElement("main", { className: "services" },
           ...data.services.map((service) =>

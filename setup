@@ -33,7 +33,7 @@ echo "Setting up Balefire for $URL..."
 
 # Reset status.yaml to defaults
 cat > status.yaml <<EOF
-title: "Balefire Status"
+title: "Status"
 url: "$URL"
 services: []
 EOF
