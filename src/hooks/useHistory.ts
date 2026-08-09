@@ -2,11 +2,18 @@ import { useState, useEffect } from "@asymmetric-effort/specifyjs";
 
 type HistogramStatus = "operational" | "degraded" | "down" | "no-data";
 
+interface IncidentEntry {
+  timestamp: string;
+  status: HistogramStatus;
+  message: string;
+}
+
 interface HistoryData {
   startTime: string;
   totalHours: number;
   generated: string;
   services: Record<string, HistogramStatus[]>;
+  messages: Record<string, IncidentEntry[]>;
 }
 
 interface UseHistoryResult {
@@ -55,4 +62,4 @@ export function useHistory(): UseHistoryResult {
   return { data, error, loading };
 }
 
-export type { HistogramStatus, HistoryData };
+export type { HistogramStatus, IncidentEntry, HistoryData };

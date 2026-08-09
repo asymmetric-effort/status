@@ -8,6 +8,13 @@ type HistogramStatus = "operational" | "degraded" | "down" | "no-data";
 interface StatusChange {
   timestamp: string;
   status: HistogramStatus;
+  message: string;
+}
+
+interface IncidentEntry {
+  timestamp: string;
+  status: HistogramStatus;
+  message: string;
 }
 
 interface HistoryData {
@@ -15,6 +22,7 @@ interface HistoryData {
   totalHours: number;
   generated: string;
   services: Record<string, HistogramStatus[]>;
+  messages: Record<string, IncidentEntry[]>;
 }
 
 const STATUS_MAP: Record<string, HistogramStatus> = {
@@ -85,13 +93,14 @@ function extractStatusTimeline(
 
       const mappedStatus = STATUS_MAP[svc.status] || "no-data";
       const timestamp = svc.updated || commit.date;
+      const message = svc.message || "";
 
       const timeline = timelines[svc.name];
       const last = timeline[timeline.length - 1];
 
-      // Only record if status actually changed
-      if (!last || last.status !== mappedStatus) {
-        timeline.push({ timestamp, status: mappedStatus });
+      // Record if status or message changed
+      if (!last || last.status !== mappedStatus || last.message !== message) {
+        timeline.push({ timestamp, status: mappedStatus, message });
       }
     }
   }
@@ -152,11 +161,20 @@ function main(): void {
 
   const histogram = buildHourlyHistogram(timelines, startTime, totalHours);
 
+  // Build message history per service (newest first)
+  const messages: Record<string, IncidentEntry[]> = {};
+  for (const [name, changes] of Object.entries(timelines)) {
+    messages[name] = changes
+      .map((c) => ({ timestamp: c.timestamp, status: c.status, message: c.message }))
+      .reverse();
+  }
+
   const historyData: HistoryData = {
     startTime: startTime.toISOString(),
     totalHours,
     generated: now.toISOString(),
     services: histogram,
+    messages,
   };
 
   mkdirSync(distDir, { recursive: true });
@@ -166,7 +184,7 @@ function main(): void {
 }
 
 export { extractStatusTimeline, buildHourlyHistogram, STATUS_MAP };
-export type { HistogramStatus, StatusChange, HistoryData };
+export type { HistogramStatus, StatusChange, IncidentEntry, HistoryData };
 
 const isMain = process.argv[1]?.endsWith("build-history.ts");
 if (isMain) {

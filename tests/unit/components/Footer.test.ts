@@ -4,10 +4,10 @@ import { createElement } from "@asymmetric-effort/specifyjs";
 import { Footer } from "../../../src/components/Footer.ts";
 
 describe("Footer", () => {
-  it("renders copyright text", () => {
+  it("renders copyright text matching specifyjs format", () => {
     const html = renderToString(createElement(Footer as any, { version: "v0.0.0" }));
-    expect(html).toContain("2025");
-    expect(html).toContain("MIT LICENSE");
+    expect(html).toContain("2025-2026");
+    expect(html).toContain("MIT License.");
   });
 
   it("renders a footer element", () => {

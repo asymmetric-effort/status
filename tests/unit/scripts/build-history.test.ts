@@ -25,7 +25,7 @@ describe("buildHourlyHistogram", () => {
   it("fills no-data before first status change", () => {
     const timelines: Record<string, StatusChange[]> = {
       "API": [
-        { timestamp: "2026-08-01T12:00:00Z", status: "operational" },
+        { timestamp: "2026-08-01T12:00:00Z", status: "operational", message: "OK" },
       ],
     };
     const result = buildHourlyHistogram(timelines, new Date("2026-08-01T00:00:00Z"), 24);
@@ -43,9 +43,9 @@ describe("buildHourlyHistogram", () => {
   it("carries status forward between changes", () => {
     const timelines: Record<string, StatusChange[]> = {
       "Web": [
-        { timestamp: "2026-08-01T00:00:00Z", status: "operational" },
-        { timestamp: "2026-08-01T06:00:00Z", status: "down" },
-        { timestamp: "2026-08-01T10:00:00Z", status: "operational" },
+        { timestamp: "2026-08-01T00:00:00Z", status: "operational", message: "OK" },
+        { timestamp: "2026-08-01T06:00:00Z", status: "down", message: "Outage" },
+        { timestamp: "2026-08-01T10:00:00Z", status: "operational", message: "OK" },
       ],
     };
     const result = buildHourlyHistogram(timelines, new Date("2026-08-01T00:00:00Z"), 24);
@@ -66,8 +66,8 @@ describe("buildHourlyHistogram", () => {
 
   it("handles multiple services independently", () => {
     const timelines: Record<string, StatusChange[]> = {
-      "API": [{ timestamp: "2026-08-01T00:00:00Z", status: "operational" }],
-      "DB": [{ timestamp: "2026-08-01T00:00:00Z", status: "down" }],
+      "API": [{ timestamp: "2026-08-01T00:00:00Z", status: "operational", message: "OK" }],
+      "DB": [{ timestamp: "2026-08-01T00:00:00Z", status: "down", message: "Outage" }],
     };
     const result = buildHourlyHistogram(timelines, new Date("2026-08-01T00:00:00Z"), 24);
     expect(result["API"][0]).toBe("operational");
@@ -76,7 +76,7 @@ describe("buildHourlyHistogram", () => {
 
   it("handles degraded status", () => {
     const timelines: Record<string, StatusChange[]> = {
-      "Web": [{ timestamp: "2026-08-01T00:00:00Z", status: "degraded" }],
+      "Web": [{ timestamp: "2026-08-01T00:00:00Z", status: "degraded", message: "Slow" }],
     };
     const result = buildHourlyHistogram(timelines, new Date("2026-08-01T00:00:00Z"), 24);
     expect(result["Web"][0]).toBe("degraded");
@@ -85,7 +85,7 @@ describe("buildHourlyHistogram", () => {
 
   it("produces correct number of hours", () => {
     const timelines: Record<string, StatusChange[]> = {
-      "Web": [{ timestamp: "2026-05-01T00:00:00Z", status: "operational" }],
+      "Web": [{ timestamp: "2026-05-01T00:00:00Z", status: "operational", message: "OK" }],
     };
     const result = buildHourlyHistogram(timelines, new Date("2026-05-01T00:00:00Z"), 2160);
     expect(result["Web"]).toHaveLength(2160);

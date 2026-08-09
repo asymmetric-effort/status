@@ -1,5 +1,5 @@
 import { createElement } from "@asymmetric-effort/specifyjs";
-import type { HistogramStatus } from "../hooks/useHistory.ts";
+import type { HistogramStatus, IncidentEntry } from "../hooks/useHistory.ts";
 
 interface HistogramProps {
   serviceName: string;
@@ -7,15 +7,9 @@ interface HistogramProps {
   startTime: string;
   currentStatus: string;
   currentMessage: string;
+  messages: IncidentEntry[];
   onClose: () => void;
 }
-
-const STATUS_COLORS: Record<HistogramStatus, string> = {
-  operational: "var(--color-up)",
-  degraded: "var(--color-degraded)",
-  down: "var(--color-down)",
-  "no-data": "var(--color-border)",
-};
 
 const STATUS_LABELS: Record<HistogramStatus, string> = {
   operational: "Operational",
@@ -30,6 +24,19 @@ function formatDate(date: Date): string {
   return `${month} ${day}`;
 }
 
+function formatTimestamp(iso: string): string {
+  const date = new Date(iso);
+  if (isNaN(date.getTime())) return iso;
+  return date.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZoneName: "short",
+  });
+}
+
 function getDayStatus(hourStatuses: HistogramStatus[]): HistogramStatus {
   if (hourStatuses.some((s) => s === "down")) return "down";
   if (hourStatuses.some((s) => s === "degraded")) return "degraded";
@@ -37,7 +44,7 @@ function getDayStatus(hourStatuses: HistogramStatus[]): HistogramStatus {
   return "no-data";
 }
 
-export function Histogram({ serviceName, hours, startTime, currentStatus, currentMessage, onClose }: HistogramProps) {
+export function Histogram({ serviceName, hours, startTime, currentStatus, currentMessage, messages, onClose }: HistogramProps) {
   const start = new Date(startTime);
 
   // Group hours into days (90 days)
@@ -96,14 +103,31 @@ export function Histogram({ serviceName, hours, startTime, currentStatus, curren
           )
         )
       ),
-      createElement("div", { className: `histogram-message histogram-message-${currentStatus}` },
-        createElement("span", { className: "histogram-message-label" },
-          STATUS_LABELS[(currentStatus === "up" ? "operational" : currentStatus) as HistogramStatus] || currentStatus
-        ),
-        createElement("span", { className: "histogram-message-text" }, currentMessage)
+      createElement("div", { className: "histogram-messages" },
+        createElement("h3", null, "Messages"),
+        messages.length > 0
+          ? createElement("div", { className: "histogram-message-list" },
+              ...messages.map((entry, i) =>
+                createElement("div", {
+                  key: String(i),
+                  className: `histogram-message-entry histogram-message-${entry.status}`,
+                },
+                  createElement("div", { className: "histogram-message-meta" },
+                    createElement("span", { className: "histogram-message-status" },
+                      STATUS_LABELS[entry.status] || entry.status
+                    ),
+                    createElement("span", { className: "histogram-message-time" },
+                      formatTimestamp(entry.timestamp)
+                    )
+                  ),
+                  createElement("div", { className: "histogram-message-text" }, entry.message)
+                )
+              )
+            )
+          : createElement("p", { className: "histogram-no-messages" }, "No incident history.")
       )
     )
   );
 }
 
-export { getDayStatus, STATUS_LABELS };
+export { getDayStatus, STATUS_LABELS, formatTimestamp };

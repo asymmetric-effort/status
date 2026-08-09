@@ -69,6 +69,7 @@ export function App() {
             startTime: history.data!.startTime,
             currentStatus: svc?.status || "up",
             currentMessage: svc?.message || "",
+            messages: history.data!.messages?.[selectedService!] || [],
             onClose: handleCloseHistogram,
           });
         })()

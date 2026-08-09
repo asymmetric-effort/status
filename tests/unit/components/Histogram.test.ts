@@ -44,6 +44,7 @@ describe("Histogram legend swatches", () => {
       hours: mockHours,
       startTime: "2026-05-11T00:00:00Z",
       onClose: () => {},
+      messages: [],
       currentStatus: "up",
       currentMessage: "All systems operational",
     }));
@@ -63,6 +64,7 @@ describe("Histogram component", () => {
       hours: mockHours,
       startTime: "2026-05-11T00:00:00Z",
       onClose: () => {},
+      messages: [],
       currentStatus: "up",
       currentMessage: "All systems operational",
     }));
@@ -75,6 +77,7 @@ describe("Histogram component", () => {
       hours: mockHours,
       startTime: "2026-05-11T00:00:00Z",
       onClose: () => {},
+      messages: [],
       currentStatus: "up",
       currentMessage: "All systems operational",
     }));
@@ -88,6 +91,7 @@ describe("Histogram component", () => {
       hours: mockHours,
       startTime: "2026-05-11T00:00:00Z",
       onClose: () => {},
+      messages: [],
       currentStatus: "up",
       currentMessage: "All systems operational",
     }));
@@ -101,6 +105,7 @@ describe("Histogram component", () => {
       hours: mockHours,
       startTime: "2026-05-11T00:00:00Z",
       onClose: () => {},
+      messages: [],
       currentStatus: "up",
       currentMessage: "All systems operational",
     }));
@@ -116,37 +121,74 @@ describe("Histogram component", () => {
       hours: mockHours,
       startTime: "2026-05-11T00:00:00Z",
       onClose: () => {},
+      messages: [],
       currentStatus: "up",
       currentMessage: "All systems operational",
     }));
     expect(html).toContain("histogram-close");
   });
 
-  it("renders the current status message below the histogram", () => {
+  it("renders Messages heading", () => {
+    const html = renderToString(createElement(Histogram as any, {
+      serviceName: "Web",
+      hours: mockHours,
+      startTime: "2026-05-11T00:00:00Z",
+      onClose: () => {},
+      messages: [],
+      currentStatus: "up",
+      currentMessage: "OK",
+    }));
+    expect(html).toContain("Messages");
+  });
+
+  it("renders 'No incident history' when messages is empty", () => {
+    const html = renderToString(createElement(Histogram as any, {
+      serviceName: "Web",
+      hours: mockHours,
+      startTime: "2026-05-11T00:00:00Z",
+      onClose: () => {},
+      messages: [],
+      currentStatus: "up",
+      currentMessage: "OK",
+    }));
+    expect(html).toContain("No incident history");
+  });
+
+  it("renders message entries with timestamps and status", () => {
     const html = renderToString(createElement(Histogram as any, {
       serviceName: "TARDIS",
       hours: mockHours,
       startTime: "2026-05-11T00:00:00Z",
       onClose: () => {},
+      messages: [
+        { timestamp: "2026-08-09T16:45:00Z", status: "degraded", message: "Temporal circuits slow" },
+        { timestamp: "2026-08-09T12:00:00Z", status: "operational", message: "All systems operational" },
+      ],
       currentStatus: "degraded",
-      currentMessage: "Temporal displacement circuits running slow",
+      currentMessage: "Temporal circuits slow",
     }));
-    expect(html).toContain("histogram-message");
+    expect(html).toContain("Temporal circuits slow");
+    expect(html).toContain("All systems operational");
     expect(html).toContain("Degraded");
-    expect(html).toContain("Temporal displacement circuits running slow");
+    expect(html).toContain("Operational");
+    expect(html).toContain("histogram-message-time");
+    expect(html).toContain("histogram-message-degraded");
+    expect(html).toContain("histogram-message-operational");
   });
 
-  it("renders status message for down services", () => {
+  it("renders message entries with color-coded borders", () => {
     const html = renderToString(createElement(Histogram as any, {
       serviceName: "WOPR",
       hours: mockHours,
       startTime: "2026-05-11T00:00:00Z",
       onClose: () => {},
+      messages: [
+        { timestamp: "2026-08-09T15:00:00Z", status: "down", message: "System offline" },
+      ],
       currentStatus: "down",
       currentMessage: "System offline",
     }));
     expect(html).toContain("histogram-message-down");
-    expect(html).toContain("Down");
     expect(html).toContain("System offline");
   });
 });
