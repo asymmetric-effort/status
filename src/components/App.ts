@@ -2,6 +2,7 @@ import { createElement, useState, useCallback } from "@asymmetric-effort/specify
 import { useStatus } from "../hooks/useStatus.ts";
 import { useHistory } from "../hooks/useHistory.ts";
 import { useVersion } from "../hooks/useVersion.ts";
+import { extendHistogram } from "../extendHistogram.ts";
 import { Header } from "./Header.ts";
 import { ServiceCard } from "./ServiceCard.ts";
 import { Histogram } from "./Histogram.ts";
@@ -63,11 +64,18 @@ export function App() {
     showHistogram
       ? (() => {
           const svc = data.services.find((s) => s.name === selectedService);
+          const currentStatus = svc?.status || "up";
+          const extended = extendHistogram(
+            history.data!.services[selectedService!],
+            history.data!.startTime,
+            history.data!.generated,
+            currentStatus,
+          );
           return createElement(Histogram as any, {
             serviceName: selectedService,
-            hours: history.data!.services[selectedService!],
-            startTime: history.data!.startTime,
-            currentStatus: svc?.status || "up",
+            hours: extended.hours,
+            startTime: extended.startTime,
+            currentStatus,
             currentMessage: svc?.message || "",
             messages: history.data!.messages?.[selectedService!] || [],
             onClose: handleCloseHistogram,
