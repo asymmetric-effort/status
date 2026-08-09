@@ -11,7 +11,7 @@ lint:
 	node --experimental-strip-types scripts/lint-status.ts
 
 test:
-	node --experimental-strip-types --test tests/unit/**/*.test.ts tests/integration/**/*.test.ts
+	node --experimental-strip-types --test tests/unit/*.test.ts tests/unit/**/*.test.ts tests/integration/**/*.test.ts
 
 build:
 	node --experimental-strip-types scripts/build.ts
