@@ -7,11 +7,11 @@ set -euo pipefail
 # Usage:
 #   ./scripts/gpg-encrypt.sh <input-file> <output-file>
 #
-# The public key must exist at subscribers/subscribers.gpg.pub
+# The public key must exist at data/public.gpg
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-PUBKEY="$ROOT_DIR/subscribers/subscribers.gpg.pub"
+PUBKEY="$ROOT_DIR/data/public.gpg"
 
 if [ $# -lt 2 ]; then
   echo "Usage: gpg-encrypt.sh <input-file> <output-file>"

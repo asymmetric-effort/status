@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "subscribers/raw/*.gpg"
+      - "data/raw/*.gpg"
 
 permissions:
   contents: write
@@ -12,43 +12,29 @@ permissions:
 jobs:
   process:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/${{ github.repository }}/runner:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           fetch-tags: true
 
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          cache: npm
-
       - run: npm ci
-
-      - name: Install GnuPG 2.5.20+ for PQC
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential libgpg-error-dev libgcrypt-dev libassuan-dev libksba-dev libnpth0-dev
-          curl -sL https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.5.20.tar.bz2 -o /tmp/gnupg.tar.bz2
-          cd /tmp && tar xjf gnupg.tar.bz2 && cd gnupg-2.5.20
-          ./configure --prefix=/usr/local
-          make -j$(nproc)
-          sudo make install
-          hash -r
 
       - name: Check GnuPG version
         run: bash scripts/check-gpg.sh
 
       - name: Import GPG private key
-        run: |
-          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        run: echo "${{ secrets.STATUS_GPG_PRIVATE_KEY }}" | gpg --batch --import
 
       - name: Validate PQC encryption on raw files
         run: |
           FAILED=0
-          for f in subscribers/raw/*.gpg; do
+          for f in data/raw/*.gpg; do
             [ -f "$f" ] || continue
             echo "Validating: $f"
             if ! bash scripts/gpg-validate.sh "$f"; then
@@ -67,7 +53,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add subscribers/lists/ subscribers/raw/
+          git add data/lists/ data/raw/
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else

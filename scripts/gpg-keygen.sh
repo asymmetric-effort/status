@@ -10,7 +10,7 @@ set -euo pipefail
 # Usage:
 #   ./scripts/gpg-keygen.sh --name "BaleFire Status" --email "status@example.com"
 #
-# The public key is exported to subscribers/subscribers.gpg.pub
+# The public key is exported to data/public.gpg
 # The private key must be stored in GitHub secrets as GPG_PRIVATE_KEY
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -72,18 +72,18 @@ echo "Keypair generated successfully."
 
 # Export public key
 mkdir -p "$ROOT_DIR/subscribers"
-gpg --armor --export "$FINGERPRINT" > "$ROOT_DIR/subscribers/subscribers.gpg.pub"
-echo "Public key exported to: subscribers/subscribers.gpg.pub"
+gpg --armor --export "$FINGERPRINT" > "$ROOT_DIR/data/public.gpg"
+echo "Public key exported to: data/public.gpg"
 
 # Export private key for GitHub secrets
-PRIVATE_KEY_FILE="$ROOT_DIR/subscribers/PRIVATE_KEY.asc"
+PRIVATE_KEY_FILE="$ROOT_DIR/data/PRIVATE_KEY.asc"
 gpg --armor --export-secret-keys "$FINGERPRINT" > "$PRIVATE_KEY_FILE"
-echo "Private key exported to: subscribers/PRIVATE_KEY.asc"
+echo "Private key exported to: data/PRIVATE_KEY.asc"
 echo ""
 echo "IMPORTANT: Store the private key in GitHub secrets as GPG_PRIVATE_KEY:"
-echo "  gh secret set GPG_PRIVATE_KEY < subscribers/PRIVATE_KEY.asc"
+echo "  gh secret set GPG_PRIVATE_KEY < data/PRIVATE_KEY.asc"
 echo ""
 echo "Then DELETE the private key file:"
-echo "  rm subscribers/PRIVATE_KEY.asc"
+echo "  rm data/PRIVATE_KEY.asc"
 echo ""
 echo "NEVER commit the private key to the repository."

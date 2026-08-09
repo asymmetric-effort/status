@@ -36,8 +36,8 @@ Thumbs.db
 .env.*
 *.pem
 *.key
-subscribers/PRIVATE_KEY.asc
-subscribers/*.secret.*
+data/PRIVATE_KEY.asc
+data/*.secret.*
 
 # Logs
 *.log

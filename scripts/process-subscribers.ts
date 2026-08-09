@@ -110,9 +110,9 @@ function isDuplicate(list: TopicList, subscriber: Subscriber): boolean {
 
 function main(): void {
   const rootDir = resolve(import.meta.dirname, "..");
-  const rawDir = resolve(rootDir, "subscribers/raw");
-  const listsDir = resolve(rootDir, "subscribers/lists");
-  const pubkeyFile = resolve(rootDir, "subscribers/subscribers.gpg.pub");
+  const rawDir = resolve(rootDir, "data/raw");
+  const listsDir = resolve(rootDir, "data/lists");
+  const pubkeyFile = resolve(rootDir, "data/public.gpg");
 
   mkdirSync(listsDir, { recursive: true });
 
