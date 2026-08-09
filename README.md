@@ -1,4 +1,4 @@
-# Bailfire
+# BaleFire
 
 A minimal, self-hosted status page built on GitHub Pages. Fork this repo, configure your services, and deploy a clean status page with zero infrastructure.
 

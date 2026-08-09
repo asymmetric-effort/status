@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Encrypt a file using the Balefire PQC public key.
+# Encrypt a file using the BaleFire PQC public key.
 # Rejects encryption if the key does not use PQC algorithms.
 #
 # Usage:

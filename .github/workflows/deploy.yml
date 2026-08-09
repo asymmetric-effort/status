@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - status.yaml
+      - data/status.yaml.gpg
       - src/**
       - scripts/**
       - index.html
@@ -40,6 +40,11 @@ jobs:
           cache: npm
 
       - run: npm ci
+
+      - name: Decrypt status.yaml
+        run: |
+          echo "${{ secrets.STATUS_GPG_PRIVATE_KEY }}" | gpg --batch --import
+          gpg --batch --yes --decrypt --output status.yaml data/status.yaml.gpg
 
       - run: make build
 

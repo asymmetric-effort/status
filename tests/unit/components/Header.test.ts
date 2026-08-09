@@ -56,8 +56,8 @@ describe("Header", () => {
     const services: Service[] = [
       { name: "Web", status: "up", message: "OK", updated: "2026-01-01T00:00:00Z" },
     ];
-    const html = renderToString(createElement(Header as any, { title: "Balefire Status", services }));
-    expect(html).toContain("Balefire Status");
+    const html = renderToString(createElement(Header as any, { title: "BaleFire Status", services }));
+    expect(html).toContain("BaleFire Status");
   });
 
   it("renders a header element with banner class", () => {

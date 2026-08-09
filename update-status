@@ -4,7 +4,11 @@ set -euo pipefail
 usage() {
   echo "Usage: ./update-status --service <name> --status <up|down|degraded> --message <msg>"
   echo ""
-  echo "Updates the status of a service in status.yaml, then commits and pushes."
+  echo "Updates the status of a service, then commits and pushes."
+  echo ""
+  echo "If data/status.yaml.gpg exists (encrypted mode), decrypts it first,"
+  echo "updates the status, re-encrypts, and commits the encrypted file."
+  echo "Falls back to plaintext status.yaml if no encrypted file exists."
   echo ""
   echo "Options:"
   echo "  --service   Service name (required)"
@@ -38,17 +42,47 @@ if [[ "$STATUS" != "up" && "$STATUS" != "down" && "$STATUS" != "degraded" ]]; th
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-echo "Updating service '$SERVICE' → $STATUS..."
-node --experimental-strip-types "$SCRIPT_DIR/scripts/yaml-update.ts" \
-  --service "$SERVICE" \
-  --status "$STATUS" \
-  --message "$MESSAGE"
-
-echo "Committing and pushing..."
 cd "$SCRIPT_DIR"
-git add status.yaml
-git commit -m "status: update $SERVICE to $STATUS"
-git push
+
+ENC_PATH="data/status.yaml.gpg"
+PLAIN_PATH="status.yaml"
+
+if [[ -f "$ENC_PATH" ]]; then
+  # Encrypted mode: decrypt → update → re-encrypt
+  echo "Decrypting status data..."
+  gpg --batch --yes --decrypt --output "$PLAIN_PATH" "$ENC_PATH"
+
+  echo "Updating service '$SERVICE' → $STATUS..."
+  node --experimental-strip-types "$SCRIPT_DIR/scripts/yaml-update.ts" \
+    --service "$SERVICE" \
+    --status "$STATUS" \
+    --message "$MESSAGE"
+
+  echo "Re-encrypting status data..."
+  RECIPIENT=$(gpg --import-options show-only --import data/public.gpg 2>&1 | grep -oP '[A-F0-9]{40}' | head -1)
+  gpg --encrypt --armor --trust-model always \
+    --recipient "$RECIPIENT" \
+    --output "$ENC_PATH.tmp" \
+    "$PLAIN_PATH"
+  mv "$ENC_PATH.tmp" "$ENC_PATH"
+  rm -f "$PLAIN_PATH"
+
+  echo "Committing and pushing..."
+  git add "$ENC_PATH"
+  git commit -m "status: update $SERVICE to $STATUS"
+  git push
+else
+  # Plaintext mode (pre-encryption setup)
+  echo "Updating service '$SERVICE' → $STATUS..."
+  node --experimental-strip-types "$SCRIPT_DIR/scripts/yaml-update.ts" \
+    --service "$SERVICE" \
+    --status "$STATUS" \
+    --message "$MESSAGE"
+
+  echo "Committing and pushing..."
+  git add "$PLAIN_PATH"
+  git commit -m "status: update $SERVICE to $STATUS"
+  git push
+fi
 
 echo "Done. Status page will rebuild automatically."

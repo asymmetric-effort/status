@@ -3,7 +3,7 @@ name: Notify
 on:
   push:
     branches: [main]
-    paths: [status.yaml]
+    paths: [data/status.yaml.gpg]
 
 jobs:
   lint-and-notify:
@@ -17,6 +17,11 @@ jobs:
           cache: npm
 
       - run: npm ci
+
+      - name: Decrypt status.yaml
+        run: |
+          echo "${{ secrets.STATUS_GPG_PRIVATE_KEY }}" | gpg --batch --import
+          gpg --batch --yes --decrypt --output status.yaml data/status.yaml.gpg
 
       - name: Lint status.yaml
         run: node --experimental-strip-types scripts/lint-status.ts

@@ -1,4 +1,4 @@
-.PHONY: clean lint test build pdv cover version version/major version/minor version/patch check-gpg
+.PHONY: clean lint test build pdv cover version version/major version/minor version/patch check-gpg tools
 
 check-gpg:
 	@bash scripts/check-gpg.sh
@@ -35,6 +35,10 @@ version/major:
 
 version/minor:
 	node --experimental-strip-types scripts/bump-version.ts minor
+
+tools:
+	mkdir -p bin
+	go build -o bin/rekey ./cmd/rekey/
 
 version/patch:
 	node --experimental-strip-types scripts/bump-version.ts patch

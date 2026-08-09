@@ -32,7 +32,7 @@ cd "$SCRIPT_DIR"
 # Verify GnuPG version for PQC support
 bash "$SCRIPT_DIR/scripts/check-gpg.sh"
 
-echo "Setting up Balefire for $URL..."
+echo "Setting up BaleFire for $URL..."
 
 # Reset status.yaml to defaults
 cat > status.yaml <<EOF
