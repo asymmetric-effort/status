@@ -26,4 +26,20 @@ describe("parseArgs", () => {
     const result = parseArgs(["--service", "API", "--status", "up", "--message", "All systems operational"]);
     expect(result.message).toBe("All systems operational");
   });
+
+  it("throws on missing service", () => {
+    expect(() => parseArgs(["--status", "up", "--message", "OK"])).toThrow();
+  });
+
+  it("throws on missing status", () => {
+    expect(() => parseArgs(["--service", "API", "--message", "OK"])).toThrow();
+  });
+
+  it("throws on invalid status", () => {
+    expect(() => parseArgs(["--service", "API", "--status", "broken", "--message", "OK"])).toThrow("Invalid status");
+  });
+
+  it("throws on empty args", () => {
+    expect(() => parseArgs([])).toThrow();
+  });
 });

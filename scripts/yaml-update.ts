@@ -21,13 +21,11 @@ function parseArgs(args: string[]): { service: string; status: string; message: 
   }
 
   if (!service || !status) {
-    console.error("Usage: yaml-update --service <name> --status <up|down|degraded> --message <msg>");
-    process.exit(1);
+    throw new Error("Usage: yaml-update --service <name> --status <up|down|degraded> --message <msg>");
   }
 
   if (!["up", "down", "degraded"].includes(status)) {
-    console.error(`Invalid status: "${status}". Must be one of: up, down, degraded`);
-    process.exit(1);
+    throw new Error(`Invalid status: "${status}". Must be one of: up, down, degraded`);
   }
 
   return { service, status, message };
