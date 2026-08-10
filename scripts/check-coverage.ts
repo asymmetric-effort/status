@@ -1,4 +1,4 @@
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 
 const THRESHOLD = 98;
@@ -21,24 +21,26 @@ function main(): void {
 
   console.log(`Running tests with coverage (threshold: ${THRESHOLD}%)...`);
 
+  const args = [
+    "--experimental-strip-types",
+    "--experimental-test-coverage",
+    "--test-coverage-exclude=src/hooks/*",
+    "--test-coverage-exclude=src/components/App.ts",
+    "--test-coverage-exclude=src/main.ts",
+    "--test-coverage-exclude=scripts/*",
+    "--test-coverage-exclude=tests/**/*",
+    "--test",
+    "tests/unit/*.test.ts",
+    "tests/unit/**/*.test.ts",
+    "tests/integration/**/*.test.ts",
+  ];
+
   try {
-    const output = execSync(
-      [
-        process.execPath,
-        "--experimental-strip-types",
-        "--experimental-test-coverage",
-        "--test-coverage-exclude=src/hooks/*",
-        "--test-coverage-exclude=src/components/App.ts",
-        "--test-coverage-exclude=src/main.ts",
-        "--test-coverage-exclude=scripts/*",
-        "--test-coverage-exclude=tests/**/*",
-        "--test",
-        "tests/unit/*.test.ts",
-        "tests/unit/**/*.test.ts",
-        "tests/integration/**/*.test.ts",
-      ].join(" "),
-      { cwd: rootDir, encoding: "utf-8", stdio: ["inherit", "pipe", "pipe"] }
-    );
+    const output = execFileSync(process.execPath, args, {
+      cwd: rootDir,
+      encoding: "utf-8",
+      stdio: ["inherit", "pipe", "pipe"],
+    });
 
     process.stdout.write(output);
 
@@ -54,7 +56,6 @@ function main(): void {
       console.warn("Ensure tests produce coverage output.");
     }
   } catch (err: any) {
-    // Tests may pass but coverage may be in the output
     const output = (err.stdout || "") + (err.stderr || "");
     if (output) process.stdout.write(output);
 
