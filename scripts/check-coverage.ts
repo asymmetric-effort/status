@@ -23,7 +23,27 @@ function main(): void {
 
   try {
     const output = execSync(
-      `${process.execPath} --experimental-strip-types --experimental-test-coverage --test-coverage-exclude=src/hooks/ --test-coverage-exclude=src/components/App.ts --test-coverage-exclude=src/main.ts --test-coverage-exclude=scripts/build.ts --test-coverage-exclude=scripts/build-history.ts --test-coverage-exclude=scripts/build-json-endpoint.ts --test-coverage-exclude=scripts/serve.ts --test-coverage-exclude=scripts/bump-version.ts --test-coverage-exclude=scripts/check-coverage.ts --test-coverage-exclude=scripts/notify.ts --test tests/unit/*.test.ts tests/unit/**/*.test.ts tests/integration/**/*.test.ts`,
+      [
+        process.execPath,
+        "--experimental-strip-types",
+        "--experimental-test-coverage",
+        "--test-coverage-exclude=src/hooks/*",
+        "--test-coverage-exclude=src/components/App.ts",
+        "--test-coverage-exclude=src/main.ts",
+        "--test-coverage-exclude=scripts/build.ts",
+        "--test-coverage-exclude=scripts/build-history.ts",
+        "--test-coverage-exclude=scripts/build-json-endpoint.ts",
+        "--test-coverage-exclude=scripts/serve.ts",
+        "--test-coverage-exclude=scripts/bump-version.ts",
+        "--test-coverage-exclude=scripts/check-coverage.ts",
+        "--test-coverage-exclude=scripts/notify.ts",
+        "--test-coverage-exclude=scripts/process-subscribers.ts",
+        "--test-coverage-exclude=tests/*",
+        "--test",
+        "tests/unit/*.test.ts",
+        "tests/unit/**/*.test.ts",
+        "tests/integration/**/*.test.ts",
+      ].join(" "),
       { cwd: rootDir, encoding: "utf-8", stdio: ["inherit", "pipe", "pipe"] }
     );
 
