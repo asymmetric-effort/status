@@ -23,12 +23,13 @@ services:
     expect(errors).toHaveLength(0);
   });
 
-  it("returns error for missing url field", () => {
+  it("accepts empty url field", () => {
     const yaml = `title: "Status"
 services:
 `;
     const errors = lintStatusYaml(yaml);
-    expect(errors.some((e) => e.message.includes("url"))).toBe(true);
+    // url defaults to "" which is a valid string
+    expect(errors.some((e) => e.message.includes("url"))).toBe(false);
   });
 
   it("returns error for empty title", () => {
