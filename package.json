@@ -20,7 +20,7 @@
     "@asymmetric-effort/nogginlessdom": "^0.0.28",
     "@asymmetric-effort/specifyjs": "^1.0.0",
     "@asymmetric-effort/steamroller": "^0.2.8",
-    "@playwright/test": "^1.59.0",
+    "@playwright/test": "^1.64.1",
     "@types/node": "^26.2.0",
     "typescript": "^5.6.0"
   },
